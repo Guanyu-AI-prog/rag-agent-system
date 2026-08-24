@@ -1,0 +1,997 @@
+#!/usr/bin/env python3
+"""
+纯 Python RAG 实现（不依赖 LangChain）
+
+保留原有系统的：
+- 分类切分策略（small/large/default）
+- 混合检索（向量 + BM25）
+- Rerank 重排序
+- LLM/Embedding/Rerank API 调用
+
+依赖：
+- chromadb
+- openai
+- rank-bm25
+- jieba
+- requests
+"""
+
+import os
+import re
+import json
+import time
+import logging
+import hashlib
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
+from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
+
+import chromadb
+import jieba
+import numpy as np
+from dotenv import load_dotenv
+from openai import OpenAI
+from rank_bm25 import BM25Okapi
+
+# 加载 .env 文件
+load_dotenv()
+
+# ========== 日志配置 ==========
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
+# ========== 数据结构 ==========
+
+@dataclass
+class Document:
+    """文档块"""
+    page_content: str
+    metadata: Dict[str, Any]
+
+
+@dataclass
+class QueryResult:
+    """查询结果"""
+    answer: str
+    sources: List[str]
+    success: bool
+    processing_time: float
+
+
+# ========== 配置类 ==========
+
+class Config:
+    """系统配置"""
+
+    # API 配置
+    LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+    LLM_API_BASE = os.getenv("LLM_API_BASE", "https://api.stepfun.com/step_plan/v1")
+    LLM_MODEL = os.getenv("LLM_MODEL", "step-3.7-flash")
+    LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
+    LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1024"))
+
+    SILICONFLOW_API_KEY = os.getenv("SILICONFLOW_API_KEY", "")
+    SILICONFLOW_API_BASE = os.getenv("SILICONFLOW_API_BASE", "https://api.siliconflow.cn/v1")
+
+    # Embedding 配置
+    EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-small-zh-v1.5")
+
+    # Rerank 配置
+    RERANK_MODEL = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3")
+    RERANK_API_URL = os.getenv("RERANK_API_URL", "https://api.siliconflow.cn/v1/rerank")
+    RERANK_TIMEOUT = int(os.getenv("RERANK_TIMEOUT", "30"))
+    RERANK_TOP_K = int(os.getenv("RERANK_TOP_K", "10"))
+
+    # 向量库配置
+    VECTOR_DB_PATH = os.getenv("VECTOR_DB_PATH", "./vector_db")
+    COLLECTION_NAME = os.getenv("COLLECTION_NAME", "langchain_collection")
+
+    # 切分配置
+    CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "300"))
+    CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "60"))
+    CHUNK_MIN_SIZE = int(os.getenv("CHUNK_MIN_SIZE", "100"))
+    CHUNK_SEPARATORS = ["\n\n", "###", "####", "#####", "\n", "。", "！", "？", "；", "，", " "]
+
+    # 分类型切分配置
+    CHUNK_PROFILES = {
+        "small": {"chunk_size": 250, "chunk_overlap": 50},
+        "large": {"chunk_size": 500, "chunk_overlap": 100},
+        "default": {"chunk_size": 300, "chunk_overlap": 60},
+    }
+    CHUNK_FILE_RULES = {
+        "small": ["Q&A", "qa_plans", "transfer_faq", "搭配，Q&A"],
+        "large": ["套餐详情", "搭配表_重构", "plan_details", "套餐搭配表.csv"],
+    }
+
+    # 检索配置
+    RETRIEVAL_K = int(os.getenv("RETRIEVAL_K", "3"))
+    VECTOR_TOP_K = int(os.getenv("VECTOR_TOP_K", "15"))
+    BM25_TOP_K = int(os.getenv("BM25_TOP_K", "5"))
+    SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.2"))
+
+    # 数据目录
+    DATA_DIR = os.getenv("DATA_DIR", "./data")
+
+    @classmethod
+    def validate(cls):
+        """验证配置"""
+        if not cls.LLM_API_KEY and not cls.SILICONFLOW_API_KEY:
+            raise ValueError("请配置 LLM_API_KEY 或 SILICONFLOW_API_KEY")
+        os.makedirs(cls.VECTOR_DB_PATH, exist_ok=True)
+        os.makedirs(cls.DATA_DIR, exist_ok=True)
+        return True
+
+
+# ========== 文本切分器 ==========
+
+class TextSplitter:
+    """递归字符文本切分器（简化版）"""
+
+    def __init__(self, chunk_size: int = 300, chunk_overlap: int = 60,
+                 separators: List[str] = None):
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.separators = separators or ["\n\n", "\n", "。", "！", "？", "；", "，", " "]
+
+    def split_text(self, text: str) -> List[str]:
+        """切分文本"""
+        if len(text) <= self.chunk_size:
+            return [text]
+
+        # 选择分隔符
+        separator = self._choose_separator(text)
+        splits = text.split(separator)
+
+        # 合并小块
+        chunks = []
+        current_chunk = ""
+
+        for split in splits:
+            if not split.strip():
+                continue
+
+            if len(current_chunk) + len(split) + len(separator) <= self.chunk_size:
+                current_chunk += (separator if current_chunk else "") + split
+            else:
+                if current_chunk:
+                    chunks.append(current_chunk)
+                current_chunk = split
+
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        # 添加重叠
+        if self.chunk_overlap > 0 and len(chunks) > 1:
+            chunks = self._add_overlap(chunks)
+
+        return chunks
+
+    def _choose_separator(self, text: str) -> str:
+        """根据文本内容选择最合适的分隔符"""
+        for sep in self.separators:
+            if sep in text:
+                return sep
+        return self.separators[-1]
+
+    def _add_overlap(self, chunks: List[str]) -> List[str]:
+        """为块添加重叠"""
+        result = [chunks[0]]
+        for i in range(1, len(chunks)):
+            # 从上一个块取末尾作为重叠
+            prev = chunks[i - 1]
+            overlap_text = prev[-self.chunk_overlap:] if len(prev) > self.chunk_overlap else prev
+            result.append(overlap_text + chunks[i])
+        return result
+
+
+class DocumentProcessor:
+    """文档处理器"""
+
+    def __init__(self):
+        self.splitter = TextSplitter(
+            chunk_size=Config.CHUNK_SIZE,
+            chunk_overlap=Config.CHUNK_OVERLAP,
+            separators=Config.CHUNK_SEPARATORS
+        )
+
+    def load_documents(self, data_dir: str = None) -> List[Document]:
+        """加载文档"""
+        data_dir = data_dir or Config.DATA_DIR
+        documents = []
+
+        if not os.path.exists(data_dir):
+            logger.warning(f"数据目录不存在: {data_dir}")
+            return documents
+
+        # 遍历所有文本文件
+        for file_path in Path(data_dir).rglob("*"):
+            if file_path.suffix in [".txt", ".md"]:
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    documents.append(Document(
+                        page_content=content,
+                        metadata={"source": str(file_path), "type": file_path.suffix}
+                    ))
+                    logger.info(f"加载文件: {file_path.name}")
+                except Exception as e:
+                    logger.warning(f"加载文件失败 {file_path}: {e}")
+
+            elif file_path.suffix == ".jsonl":
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        for line_num, line in enumerate(f, 1):
+                            line = line.strip()
+                            if not line:
+                                continue
+                            try:
+                                obj = json.loads(line)
+                                if "q" in obj and "a" in obj:
+                                    text = f"问：{obj['q']}\n答：{obj['a']}"
+                                else:
+                                    text = "\n".join(f"{k}：{v}" for k, v in obj.items() if not k.startswith("_"))
+                                documents.append(Document(
+                                    page_content=text,
+                                    metadata={"source": str(file_path), "line": line_num, "type": "jsonl"}
+                                ))
+                            except json.JSONDecodeError:
+                                pass
+                    logger.info(f"加载 JSONL: {file_path.name}")
+                except Exception as e:
+                    logger.warning(f"加载 JSONL 失败 {file_path}: {e}")
+
+            elif file_path.suffix == ".csv":
+                try:
+                    import csv
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        reader = csv.DictReader(f)
+                        for line_num, row in enumerate(reader, 2):
+                            text = "，".join(f"{k}：{v}" for k, v in row.items() if v and v != "-")
+                            documents.append(Document(
+                                page_content=text,
+                                metadata={"source": str(file_path), "line": line_num, "type": "csv"}
+                            ))
+                    logger.info(f"加载 CSV: {file_path.name}")
+                except Exception as e:
+                    logger.warning(f"加载 CSV 失败 {file_path}: {e}")
+
+        logger.info(f"共加载 {len(documents)} 个文档")
+        return documents
+
+    def split_documents(self, documents: List[Document]) -> List[Document]:
+        """切分文档"""
+        # 分离原子文档（jsonl/csv）和需要切分的文档
+        atomic_docs = [d for d in documents if d.metadata.get("type") in ("jsonl", "csv")]
+        other_docs = [d for d in documents if d.metadata.get("type") not in ("jsonl", "csv")]
+
+        # 按文件名分组，应用不同的切分策略
+        grouped: Dict[str, List[Document]] = {}
+        for doc in other_docs:
+            profile = self._get_chunk_profile(doc.metadata.get("source", ""))
+            grouped.setdefault(profile, []).append(doc)
+
+        # 切分
+        all_chunks = []
+        for profile, docs in grouped.items():
+            params = Config.CHUNK_PROFILES.get(profile, Config.CHUNK_PROFILES["default"])
+            splitter = TextSplitter(
+                chunk_size=params["chunk_size"],
+                chunk_overlap=params["chunk_overlap"],
+                separators=Config.CHUNK_SEPARATORS
+            )
+
+            for doc in docs:
+                chunks = splitter.split_text(doc.page_content)
+                for chunk in chunks:
+                    all_chunks.append(Document(
+                        page_content=chunk,
+                        metadata=doc.metadata
+                    ))
+
+            logger.info(f"[{profile}] {len(docs)} 个文档 → {len(all_chunks)} 个 chunk")
+
+        # 合并超短 chunk
+        all_chunks = self._merge_short_chunks(all_chunks)
+
+        # 添加原子文档
+        all_chunks.extend(atomic_docs)
+
+        logger.info(f"切分完成，共 {len(all_chunks)} 个文本块")
+        return all_chunks
+
+    def _get_chunk_profile(self, source: str) -> str:
+        """根据文件名确定切分策略"""
+        filename = os.path.basename(source)
+        for profile, keywords in Config.CHUNK_FILE_RULES.items():
+            if any(kw in filename for kw in keywords):
+                return profile
+        return "default"
+
+    def _merge_short_chunks(self, chunks: List[Document]) -> List[Document]:
+        """合并超短 chunk"""
+        if not chunks:
+            return chunks
+
+        min_size = Config.CHUNK_MIN_SIZE
+        merged = []
+        current = chunks[0]
+
+        for chunk in chunks[1:]:
+            if len(current.page_content) < min_size:
+                # 合并到前一个块
+                current = Document(
+                    page_content=current.page_content + "\n" + chunk.page_content,
+                    metadata=current.metadata
+                )
+            else:
+                merged.append(current)
+                current = chunk
+
+        merged.append(current)
+        return merged
+
+
+# ========== 嵌入模型 ==========
+
+class EmbeddingModel:
+    """嵌入模型（使用 OpenAI 兼容 API）"""
+
+    def __init__(self):
+        # Embedding 使用 SiliconFlow API（xiaomimimo 不支持 embedding）
+        api_key = Config.SILICONFLOW_API_KEY
+        api_base = Config.SILICONFLOW_API_BASE
+        self.client = OpenAI(api_key=api_key, base_url=api_base)
+        self.model = Config.EMBED_MODEL
+        self._cache: Dict[str, List[float]] = {}
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """批量嵌入文档"""
+        # 检查缓存
+        uncached = []
+        uncached_indices = []
+        results = [None] * len(texts)
+
+        for i, text in enumerate(texts):
+            cache_key = hashlib.md5(text.encode()).hexdigest()
+            if cache_key in self._cache:
+                results[i] = self._cache[cache_key]
+            else:
+                uncached.append(text)
+                uncached_indices.append(i)
+
+        # 调用 API 嵌入未缓存的文本（截断超长文本，避免API报错）
+        if uncached:
+            try:
+                safe_texts = [t[:512] if len(t) > 512 else t for t in uncached]
+                response = self.client.embeddings.create(
+                    model=self.model,
+                    input=safe_texts
+                )
+                for j, item in enumerate(response.data):
+                    idx = uncached_indices[j]
+                    results[idx] = item.embedding
+                    # 缓存
+                    cache_key = hashlib.md5(texts[idx].encode()).hexdigest()
+                    self._cache[cache_key] = item.embedding
+            except Exception as e:
+                logger.error(f"嵌入失败: {e}")
+                raise
+
+        return results
+
+    def embed_query(self, query: str) -> List[float]:
+        """嵌入查询"""
+        return self.embed_documents([query])[0]
+
+
+# ========== BM25 检索器 ==========
+
+class BM25Retriever:
+    """BM25 关键词检索器"""
+
+    def __init__(self, documents: List[Document]):
+        self.documents = documents
+        # 预计算分词
+        self.tokenized_docs = [list(jieba.cut(doc.page_content)) for doc in documents]
+        self.bm25 = BM25Okapi(self.tokenized_docs)
+        self._query_cache: Dict[str, List[str]] = {}
+        logger.info(f"BM25 检索器初始化完成，文档数: {len(documents)}")
+
+    def search(self, query: str, top_k: int = 5) -> List[Document]:
+        """搜索"""
+        # 缓存查询分词
+        if query not in self._query_cache:
+            self._query_cache[query] = list(jieba.cut(query))
+            if len(self._query_cache) > 1000:
+                # 清理一半缓存
+                keys = list(self._query_cache.keys())
+                for k in keys[:500]:
+                    del self._query_cache[k]
+
+        tokenized_query = self._query_cache[query]
+        scores = self.bm25.get_scores(tokenized_query)
+        top_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
+        return [self.documents[i] for i in top_indices if scores[i] > 0]
+
+
+# ========== 向量存储 ==========
+
+class VectorStore:
+    """向量存储（基于 Chroma）"""
+
+    def __init__(self, embedding_model: EmbeddingModel):
+        self.embedding_model = embedding_model
+        self.client = chromadb.PersistentClient(path=Config.VECTOR_DB_PATH)
+        self.collection = None
+
+    def create_or_load(self, collection_name: str = None):
+        """创建或加载集合"""
+        collection_name = collection_name or Config.COLLECTION_NAME
+        self.collection = self.client.get_or_create_collection(
+            name=collection_name,
+            metadata={"hnsw:space": "cosine"}
+        )
+        logger.info(f"向量库加载成功，文档数: {self.collection.count()}")
+        return self
+
+    def add_documents(self, documents: List[Document]):
+        """添加文档"""
+        if not self.collection:
+            self.create_or_load()
+
+        # 准备数据
+        texts = [doc.page_content for doc in documents]
+        metadatas = [doc.metadata for doc in documents]
+        ids = [f"doc_{i}" for i in range(len(documents))]
+
+        # 批量嵌入并添加
+        batch_size = 100
+        for i in range(0, len(texts), batch_size):
+            batch_texts = texts[i:i + batch_size]
+            batch_metas = metadatas[i:i + batch_size]
+            batch_ids = ids[i:i + batch_size]
+
+            embeddings = self.embedding_model.embed_documents(batch_texts)
+
+            self.collection.add(
+                documents=batch_texts,
+                embeddings=embeddings,
+                metadatas=batch_metas,
+                ids=batch_ids
+            )
+
+        logger.info(f"添加了 {len(documents)} 个文档到向量库")
+
+    def search(self, query: str, top_k: int = None) -> List[Document]:
+        """向量检索"""
+        if not self.collection:
+            return []
+
+        top_k = top_k or Config.VECTOR_TOP_K
+
+        # 嵌入查询
+        query_embedding = self.embedding_model.embed_query(query)
+
+        # 检索
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+            include=["documents", "metadatas", "distances"]
+        )
+
+        # 转换为 Document
+        documents = []
+        if results["documents"] and results["documents"][0]:
+            for doc, meta, dist in zip(
+                results["documents"][0],
+                results["metadatas"][0],
+                results["distances"][0]
+            ):
+                documents.append(Document(
+                    page_content=doc,
+                    metadata=meta or {}
+                ))
+
+        return documents
+
+    def get_count(self) -> int:
+        """获取文档数量"""
+        if self.collection:
+            return self.collection.count()
+        return 0
+
+
+# ========== Rerank 重排序 ==========
+
+class Reranker:
+    """Rerank 重排序器"""
+
+    def __init__(self):
+        self.api_url = Config.RERANK_API_URL
+        self.api_key = Config.SILICONFLOW_API_KEY
+        self.model = Config.RERANK_MODEL
+        self.timeout = Config.RERANK_TIMEOUT
+        self._cache: Dict[str, List[int]] = {}
+
+    def rerank(self, query: str, documents: List[Document], top_k: int = None) -> List[Document]:
+        """重排序"""
+        if not documents:
+            return []
+
+        top_k = top_k or Config.RETRIEVAL_K
+
+        # 检查缓存
+        cache_key = self._make_cache_key(query, documents)
+        if cache_key in self._cache:
+            indices = self._cache[cache_key]
+            return [documents[i] for i in indices if i < len(documents)]
+
+        # 调用 API
+        import requests
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": self.model,
+            "query": query,
+            "documents": [doc.page_content for doc in documents],
+            "top_n": top_k,
+            "return_documents": False
+        }
+
+        try:
+            response = requests.post(
+                self.api_url,
+                headers=headers,
+                json=payload,
+                timeout=self.timeout
+            )
+            response.raise_for_status()
+            result = response.json()
+
+            # 提取排序后的索引
+            indices = [item["index"] for item in result.get("results", [])]
+            reranked = [documents[i] for i in indices if i < len(documents)]
+
+            # 缓存
+            self._cache[cache_key] = indices
+
+            return reranked
+        except Exception as e:
+            logger.warning(f"Rerank 失败: {e}")
+            return documents[:top_k]
+
+    def _make_cache_key(self, query: str, documents: List[Document]) -> str:
+        """生成缓存键"""
+        query_hash = hashlib.md5(query.encode()).hexdigest()[:8]
+        doc_hash = hashlib.md5(
+            "".join(d.page_content[:50] for d in documents).encode()
+        ).hexdigest()[:8]
+        return f"{query_hash}:{doc_hash}"
+
+
+# ========== LLM 生成器 ==========
+
+class LLMGenerator:
+    """LLM 生成器"""
+
+    def __init__(self):
+        api_key = Config.LLM_API_KEY or Config.SILICONFLOW_API_KEY
+        api_base = Config.LLM_API_BASE or Config.SILICONFLOW_API_BASE
+        self.client = OpenAI(api_key=api_key, base_url=api_base)
+        self.model = Config.LLM_MODEL
+        self.temperature = Config.LLM_TEMPERATURE
+        self.max_tokens = Config.LLM_MAX_TOKENS
+
+    def generate(self, query: str, context: str, history: str = "") -> str:
+        """生成回答"""
+        history_block = f"\n【对话历史】\n{history}\n" if history else ""
+
+        prompt = f"""你是一个电信营业厅的客服培训助手，专门帮助新入职的店员学习套餐推荐技巧。
+{history_block}
+你的职责是：
+1. 根据店员描述的客户场景（家庭人数、使用习惯、预算等），推荐最合适的套餐方案
+2. 解释推荐理由，帮助店员理解推荐逻辑
+3. 提供话术建议，教店员如何向客户介绍套餐
+4. 如果店员的推荐不当，指出问题并给出更好的建议
+
+【重要规则】
+1. 只能基于提供的上下文信息推荐套餐，不要编造不存在的套餐
+2. 推荐时要结合客户场景给出具体理由（如人数→副卡需求、用量→流量档位、预算→价格区间）
+3. 如果上下文中没有匹配的套餐，如实告知并引导店员进一步了解客户需求
+4. 回答要简洁实用（150-300字），重点突出推荐结论和话术要点
+5. 使用中文回答
+6. 主动补充关联信息：如副卡费用、宽带赠送、购机优惠等，帮助店员全面介绍
+7. 涉及对比或汇总类问题时，必须列举上下文中所有相关档位，不要遗漏任何一个
+
+【上下文信息】
+{context}
+
+【店员提问】
+{query}
+
+【培训指导】"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=self.temperature,
+                max_tokens=self.max_tokens
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"LLM 生成失败: {e}")
+            return f"查询失败：{str(e)}"
+
+
+# ========== 混合检索器 ==========
+
+class HybridRetriever:
+    """混合检索器（向量 + BM25）"""
+
+    def __init__(self, vector_store: VectorStore, bm25_retriever: BM25Retriever,
+                 reranker: Reranker):
+        self.vector_store = vector_store
+        self.bm25_retriever = bm25_retriever
+        self.reranker = reranker
+
+    def search(self, query: str, top_k: int = None) -> List[Document]:
+        """混合检索"""
+        top_k = top_k or Config.RETRIEVAL_K
+
+        # 并行执行向量检索和 BM25 检索
+        vector_docs = []
+        bm25_docs = []
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            vector_future = executor.submit(self.vector_store.search, query, Config.VECTOR_TOP_K)
+            bm25_future = executor.submit(self.bm25_retriever.search, query, Config.BM25_TOP_K)
+
+            try:
+                vector_docs = vector_future.result(timeout=30)
+                logger.info(f"向量检索命中: {len(vector_docs)} 个")
+            except Exception as e:
+                logger.warning(f"向量检索失败: {e}")
+
+            try:
+                bm25_docs = bm25_future.result(timeout=10)
+                logger.info(f"BM25 检索命中: {len(bm25_docs)} 个")
+            except Exception as e:
+                logger.warning(f"BM25 检索失败: {e}")
+
+        # 合并去重
+        seen = set()
+        merged = []
+        for doc in vector_docs + bm25_docs:
+            key = doc.page_content.strip()
+            if key not in seen:
+                seen.add(key)
+                merged.append(doc)
+
+        if not merged:
+            return []
+
+        # Rerank 重排序
+        reranked = self.reranker.rerank(query, merged, top_k)
+
+        logger.info(f"检索完成: 向量 {len(vector_docs)} + BM25 {len(bm25_docs)} → {len(reranked)} 个")
+        return reranked
+
+    def bare_search(self, query: str, top_k: int = None) -> List[Document]:
+        """混合检索（不带 Rerank），用于多路子查询场景"""
+        top_k = top_k or Config.VECTOR_TOP_K
+
+        # 并行执行向量检索和 BM25 检索
+        vector_docs = []
+        bm25_docs = []
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            vector_future = executor.submit(self.vector_store.search, query, top_k)
+            bm25_future = executor.submit(self.bm25_retriever.search, query, Config.BM25_TOP_K)
+
+            try:
+                vector_docs = vector_future.result(timeout=30)
+            except Exception as e:
+                logger.warning(f"bare_search 向量检索失败: {e}")
+
+            try:
+                bm25_docs = bm25_future.result(timeout=10)
+            except Exception as e:
+                logger.warning(f"bare_search BM25 检索失败: {e}")
+
+        # 合并去重
+        seen = set()
+        merged = []
+        for doc in vector_docs + bm25_docs:
+            key = doc.page_content.strip()
+            if key not in seen:
+                seen.add(key)
+                merged.append(doc)
+
+        logger.info(f"bare_search: 向量 {len(vector_docs)} + BM25 {len(bm25_docs)} → 合并 {len(merged)}")
+        return merged
+
+
+# ========== RAG 系统 ==========
+
+class SimpleRAG:
+    """纯 Python RAG 系统"""
+
+    def __init__(self):
+        logger.info("初始化 RAG 系统...")
+
+        # 初始化组件
+        self.embedding_model = EmbeddingModel()
+        self.vector_store = VectorStore(self.embedding_model)
+        self.bm25_retriever = None
+        self.reranker = Reranker()
+        self.llm = LLMGenerator()
+        self.hybrid_retriever = None
+
+        # 加载向量库
+        self.vector_store.create_or_load()
+
+        # 加载 BM25 索引
+        self._init_bm25()
+
+        # 初始化混合检索器
+        if self.bm25_retriever:
+            self.hybrid_retriever = HybridRetriever(
+                self.vector_store,
+                self.bm25_retriever,
+                self.reranker
+            )
+
+        logger.info("RAG 系统初始化完成")
+
+    def _init_bm25(self):
+        """初始化 BM25 索引"""
+        count = self.vector_store.get_count()
+        if count == 0:
+            logger.warning("向量库为空，跳过 BM25 初始化")
+            return
+
+        try:
+            # 从向量库获取所有文档
+            collection = self.vector_store.collection
+            all_data = collection.get(include=["documents", "metadatas"])
+
+            documents = [
+                Document(page_content=doc, metadata=meta or {})
+                for doc, meta in zip(all_data["documents"], all_data["metadatas"])
+            ]
+
+            self.bm25_retriever = BM25Retriever(documents)
+            logger.info(f"BM25 索引初始化完成，文档数: {len(documents)}")
+        except Exception as e:
+            logger.error(f"BM25 初始化失败: {e}")
+
+    def load_knowledge_base(self, data_dir: str = None):
+        """加载知识库"""
+        processor = DocumentProcessor()
+
+        # 加载文档
+        documents = processor.load_documents(data_dir)
+        if not documents:
+            logger.warning("没有找到文档")
+            return 0
+
+        # 切分文档
+        chunks = processor.split_documents(documents)
+
+        # 添加到向量库
+        self.vector_store.add_documents(chunks)
+
+        # 重新初始化 BM25
+        self._init_bm25()
+
+        # 重新初始化混合检索器
+        if self.bm25_retriever:
+            self.hybrid_retriever = HybridRetriever(
+                self.vector_store,
+                self.bm25_retriever,
+                self.reranker
+            )
+
+        return len(chunks)
+
+    def query(self, question: str, history: str = "") -> QueryResult:
+        """查询"""
+        start_time = time.time()
+
+        if not self.hybrid_retriever:
+            return QueryResult(
+                answer="知识库未初始化，请先加载知识库",
+                sources=[],
+                success=False,
+                processing_time=0
+            )
+
+        # 查询改写
+        rewritten = self._rewrite_query(question)
+
+        # 意图分类 + 查询扩展
+        intent = self._classify_intent(rewritten)
+        queries = self._expand_queries(rewritten, intent)
+
+        if len(queries) > 1:
+            logger.info(f"查询扩展: intent={intent}, {len(queries)} 个子查询: {queries}")
+            docs = self._multi_query_retrieve(queries)
+        else:
+            docs = self.hybrid_retriever.search(rewritten, Config.RETRIEVAL_K)
+
+        if not docs:
+            return QueryResult(
+                answer="抱歉，未找到相关信息",
+                sources=[],
+                success=True,
+                processing_time=time.time() - start_time
+            )
+
+        # 拼接上下文
+        context = "\n\n".join([doc.page_content for doc in docs])
+        sources = [doc.page_content[:100] for doc in docs]
+
+        # LLM 生成
+        answer = self.llm.generate(question, context, history)
+
+        elapsed = time.time() - start_time
+
+        return QueryResult(
+            answer=answer,
+            sources=sources,
+            success=True,
+            processing_time=elapsed
+        )
+
+    def _rewrite_query(self, query: str) -> str:
+        """查询改写"""
+        rewritten = query
+
+        # 单位转换
+        rewritten = re.sub(r'(?<!\w)(\d+)G(?!\w)', r'\1GB', rewritten)
+
+        # 价格提取
+        price_match = re.search(r'(\d+)\s*元', query)
+        if price_match:
+            rewritten += f" {price_match.group(1)}元"
+
+        return rewritten
+
+    def _classify_intent(self, query: str) -> str:
+        """判断查询意图：recommend / compare / fact"""
+        recommend_keywords = ["推荐", "适合", "合适", "怎么选", "选哪个", "建议", "划算", "性价比"]
+        compare_keywords = ["对比", "比较", "区别", "差异", "不同"]
+        if any(kw in query for kw in recommend_keywords):
+            return "recommend"
+        if any(kw in query for kw in compare_keywords):
+            return "compare"
+        return "fact"
+
+    def _expand_queries(self, query: str, intent: str) -> List[str]:
+        """根据意图扩展查询词列表"""
+        queries = [query]  # 始终包含原始查询
+
+        if intent == "recommend":
+            # 学生/低价场景
+            if any(kw in query for kw in ["学生", "便宜", "低价", "预算"]):
+                queries.extend(["29元套餐", "39元套餐 星卡", "59元套餐 流量"])
+            # 大流量/视频场景
+            if any(kw in query for kw in ["流量多", "大流量", "视频", "看视频"]):
+                queries.extend(["大流量套餐", "129元套餐 流量", "199元套餐 流量", "299元套餐 流量"])
+            # 全家/家庭场景
+            if any(kw in query for kw in ["全家", "老人", "小孩", "家庭"]):
+                queries.extend(["副卡 套餐", "129元套餐 副卡", "宽带 融合套餐"])
+            # 购机场景
+            if any(kw in query for kw in ["买手机", "购机", "新手机"]):
+                queries.extend(["橙分期 补贴", "购机优惠 直降"])
+
+        elif intent == "compare":
+            # 提取套餐数字，为每个套餐生成独立查询
+            tiers = re.findall(r'(\d+)\s*元', query)
+            for tier in tiers:
+                queries.append(f"{tier}元套餐 流量 通话 宽带")
+
+        # 去重
+        seen = set()
+        unique = []
+        for q in queries:
+            if q not in seen:
+                seen.add(q)
+                unique.append(q)
+        return unique
+
+    def _multi_query_retrieve(self, queries: List[str]) -> List[Document]:
+        """多查询并行检索：bare_search → 合并 → 单次 Rerank"""
+        all_docs = []
+        with ThreadPoolExecutor(max_workers=min(len(queries), 4)) as executor:
+            futures = {
+                executor.submit(self.hybrid_retriever.bare_search, q, Config.VECTOR_TOP_K): q
+                for q in queries
+            }
+            for future in futures:
+                try:
+                    docs = future.result(timeout=30)
+                    all_docs.extend(docs)
+                except Exception as e:
+                    logger.warning(f"多路检索子查询失败: {e}")
+
+        # 合并去重
+        seen = set()
+        merged = []
+        for doc in all_docs:
+            key = doc.page_content.strip()
+            if key not in seen:
+                seen.add(key)
+                merged.append(doc)
+
+        if not merged:
+            return []
+
+        # 只做一次 Rerank
+        reranked = self.reranker.rerank(queries[0], merged, Config.RETRIEVAL_K)
+        logger.info(f"多路检索: {len(queries)} 子查询 → {len(all_docs)} 条 → 去重 {len(merged)} → Rerank {len(reranked)}")
+        return reranked
+
+    def get_stats(self) -> Dict[str, Any]:
+        """获取统计信息"""
+        return {
+            "status": "ready",
+            "document_count": self.vector_store.get_count(),
+            "llm_model": Config.LLM_MODEL,
+            "embedding_model": Config.EMBED_MODEL,
+            "rerank_model": Config.RERANK_MODEL,
+            "vector_db_path": Config.VECTOR_DB_PATH,
+        }
+
+
+# ========== 使用示例 ==========
+
+if __name__ == "__main__":
+    # 验证配置
+    Config.validate()
+
+    # 创建 RAG 实例
+    rag = SimpleRAG()
+
+    # 如果向量库为空，加载知识库
+    if rag.get_stats()["document_count"] == 0:
+        print("知识库为空，开始加载...")
+        count = rag.load_knowledge_base(Config.DATA_DIR)
+        print(f"加载完成，共 {count} 个文本块")
+
+    # 打印统计信息
+    stats = rag.get_stats()
+    print(f"\n知识库状态:")
+    for k, v in stats.items():
+        print(f"  {k}: {v}")
+
+    # 交互式查询
+    print("\n" + "=" * 50)
+    print("RAG 查询系统（输入 quit 退出）")
+    print("=" * 50)
+
+    while True:
+        try:
+            question = input("\n🧑 你: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\n👋 再见！")
+            break
+
+        if not question:
+            continue
+        if question.lower() in ("quit", "exit", "q"):
+            print("👋 再见！")
+            break
+
+        result = rag.query(question)
+        print(f"\n💬 回答:\n{result.answer}")
+        print(f"\n⏱  耗时: {result.processing_time:.2f}s")

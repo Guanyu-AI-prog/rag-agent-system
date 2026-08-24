@@ -1,0 +1,1504 @@
+INFO:     Started server process [5283]
+INFO:     Waiting for application startup.
+2026-06-23 22:38:33,136 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 22:38:33,136 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 22:38:33,136 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 22:38:33,136 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 22:38:33,288 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 22:38:33,792 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 22:38:33,792 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 22:38:33,792 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 22:38:33,991 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 22:38:34,054 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 22:38:34,136 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:38:34,137 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:38:34,145 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 133
+2026-06-23 22:38:34,145 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 22:38:34,148 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 22:38:34,148 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.473 seconds.
+2026-06-23 22:38:34,620 | DEBUG    | jieba                | initialize      | Loading model cost 0.473 seconds.
+Prefix dict has been built successfully.
+2026-06-23 22:38:34,621 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 22:38:34,670 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 133
+2026-06-23 22:38:34,670 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 22:38:34,671 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 22:38:34,671 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 22:38:34,671 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+2026-06-23 22:39:12,123 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐包含多少流量
+2026-06-23 22:39:12,123 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 22:39:12,124 | INFO     | dx_agent             | run_single      | fast-path: 直接 RAG 查询
+2026-06-23 22:39:12,124 | INFO     | workflow_langchain   | _expand_query_intent | 意图识别: '流量' -> 扩展关键词 '流量 基础 通用 赠送 GB 套餐'
+2026-06-23 22:39:12,124 | INFO     | workflow_langchain   | query           | 查询改写: '59套餐包含多少流量' -> '59套餐包含多少流量 流量 基础 通用 赠送 GB 套餐'
+2026-06-23 22:39:12,124 | INFO     | workflow_langchain   | query           | 查询: 59套餐包含多少流量 流量 基础 通用 赠送 GB 套餐...
+2026-06-23 22:39:12,126 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:39:12,496 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:39:12,530 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:39:12,530 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 19 个文档过滤到 9 个
+2026-06-23 22:39:12,530 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 9 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:39:12,530 | INFO     | cache_manager        | get_rerank_cache | Rerank 缓存已初始化
+2026-06-23 22:39:19,023 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:39:19,029 | INFO     | dx_agent             | run_single      | 查询完成，耗时 6.91s，success=True，路由=fast-path
+INFO:     127.0.0.1:42728 - "POST /query HTTP/1.1" 200 OK
+INFO:     8.163.101.180:50346 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [5283]
+om the default dictionary ...
+2026-06-23 22:38:51,815 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 22:38:51,815 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.469 seconds.
+2026-06-23 22:38:52,284 | DEBUG    | jieba                | initialize      | Loading model cost 0.469 seconds.
+Prefix dict has been built successfully.
+2026-06-23 22:38:52,284 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 22:38:52,333 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 133
+2026-06-23 22:38:52,333 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 22:38:52,333 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 22:38:52,334 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 22:38:52,334 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8002): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [5891]
+INFO:     Waiting for application startup.
+2026-06-23 22:41:22,802 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 22:41:22,802 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 22:41:22,802 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 22:41:22,802 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 22:41:22,957 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 22:41:23,474 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 22:41:23,474 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 22:41:23,474 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 22:41:23,675 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 22:41:23,742 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 22:41:23,825 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:41:23,826 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:41:23,834 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 133
+2026-06-23 22:41:23,834 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 22:41:23,837 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 22:41:23,837 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.472 seconds.
+2026-06-23 22:41:24,309 | DEBUG    | jieba                | initialize      | Loading model cost 0.472 seconds.
+Prefix dict has been built successfully.
+2026-06-23 22:41:24,309 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 22:41:24,358 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 133
+2026-06-23 22:41:24,358 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 22:41:24,358 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 22:41:24,358 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 22:41:24,358 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59386 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:22401 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:22016 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:22016 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-06-23 22:42:18,164 | INFO     | dx_agent             | run_single      | 用户查询: 各套餐转网数量对比
+2026-06-23 22:42:18,164 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 22:42:18,165 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:42:18,166 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:42:18,496 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:42:18,521 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:42:18,521 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 15 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:42:18,521 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 22:42:24,651 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:42:24,657 | INFO     | dx_agent             | run_single      | 查询完成，耗时 6.49s，success=True，路由=comparison
+INFO:     113.68.236.219:22016 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 22:42:32,071 | INFO     | dx_agent             | run_single      | 用户查询: 对比99和129套餐
+2026-06-23 22:42:32,186 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-06-23 22:42:32,186 | WARNING  | dx_agent             | _rewrite_query  | 查询重写失败，使用原查询: Error code: 400 - {'code': 20012, 'message': 'Model does not exist. Please check it carefully.', 'data': None}
+2026-06-23 22:42:32,187 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:42:32,188 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:42:32,416 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:42:32,416 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 18 个文档过滤到 11 个
+2026-06-23 22:42:32,416 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 11 个 chunk（向量 10 + BM25 10）
+INFO:     113.68.236.219:23363 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 22:43:02,447 | ERROR    | dx_agent             | _fast_path_comparison | 对比快速路径异常: Request timed out.
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_backends/sync.py", line 126, in read
+    with map_exceptions(exc_map):
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 982, in request
+    response = self._client.send(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/dx_agent.py", line 939, in _fast_path_comparison
+    answer = _do_call()
+  File "/root/langchain_rag_code/dx_agent.py", line 203, in wrapper
+    return func(*args, **kwargs)
+  File "/root/langchain_rag_code/dx_agent.py", line 931, in _do_call
+    response = client.chat.completions.create(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1000, in request
+    raise APITimeoutError(request=request) from err
+openai.APITimeoutError: Request timed out.
+2026-06-23 22:43:02,449 | INFO     | dx_agent             | run_single      | 查询完成，耗时 30.26s，success=True，路由=comparison
+INFO:     113.68.236.219:21377 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 22:43:06,444 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐包含多少流量
+2026-06-23 22:43:06,571 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-06-23 22:43:06,571 | WARNING  | dx_agent             | _rewrite_query  | 查询重写失败，使用原查询: Error code: 400 - {'code': 20012, 'message': 'Model does not exist. Please check it carefully.', 'data': None}
+2026-06-23 22:43:06,572 | INFO     | dx_agent             | run_single      | fast-path: 直接 RAG 查询
+2026-06-23 22:43:06,572 | INFO     | workflow_langchain   | _expand_query_intent | 意图识别: '流量' -> 扩展关键词 '流量 基础 通用 赠送 GB 套餐'
+2026-06-23 22:43:06,572 | INFO     | workflow_langchain   | query           | 查询改写: '59套餐包含多少流量' -> '59套餐包含多少流量 流量 基础 通用 赠送 GB 套餐'
+2026-06-23 22:43:06,572 | INFO     | workflow_langchain   | query           | 查询: 59套餐包含多少流量 流量 基础 通用 赠送 GB 套餐...
+2026-06-23 22:43:06,574 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:43:06,813 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:43:06,813 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 19 个文档过滤到 9 个
+2026-06-23 22:43:06,813 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 9 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:43:06,813 | INFO     | cache_manager        | get_rerank_cache | Rerank 缓存已初始化
+INFO:     113.68.236.219:20608 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 22:43:19,114 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:43:19,115 | INFO     | dx_agent             | run_single      | 查询完成，耗时 12.54s，success=True，路由=fast-path
+INFO:     113.68.236.219:21377 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 22:43:22,095 | INFO     | dx_agent             | run_single      | 用户查询: 129套餐有宽带吗
+2026-06-23 22:43:22,203 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-06-23 22:43:22,203 | WARNING  | dx_agent             | _rewrite_query  | 查询重写失败，使用原查询: Error code: 400 - {'code': 20012, 'message': 'Model does not exist. Please check it carefully.', 'data': None}
+2026-06-23 22:43:22,203 | INFO     | dx_agent             | run_single      | fast-path: 直接 RAG 查询
+2026-06-23 22:43:22,204 | INFO     | workflow_langchain   | _expand_query_intent | 意图识别: '宽带' -> 扩展关键词 '宽带 安装 融合 兆'
+2026-06-23 22:43:22,204 | INFO     | workflow_langchain   | query           | 查询改写: '129套餐有宽带吗' -> '129套餐有宽带吗 宽带 安装 融合 兆'
+2026-06-23 22:43:22,204 | INFO     | workflow_langchain   | query           | 查询: 129套餐有宽带吗 宽带 安装 融合 兆...
+2026-06-23 22:43:22,205 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:43:22,466 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:43:22,466 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '129元' 从 17 个文档过滤到 7 个
+2026-06-23 22:43:22,466 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:43:26,017 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:43:26,017 | INFO     | dx_agent             | run_single      | 查询完成，耗时 3.81s，success=True，路由=fast-path
+INFO:     113.68.236.219:21377 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 22:43:38,398 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐跟99套餐对比
+2026-06-23 22:43:38,506 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-06-23 22:43:38,507 | WARNING  | dx_agent             | _rewrite_query  | 查询重写失败，使用原查询: Error code: 400 - {'code': 20012, 'message': 'Model does not exist. Please check it carefully.', 'data': None}
+2026-06-23 22:43:38,507 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:43:38,508 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:43:38,753 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:43:38,753 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 18 个文档过滤到 11 个
+2026-06-23 22:43:38,753 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 11 个 chunk（向量 10 + BM25 10）
+INFO:     113.68.236.219:22272 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 22:43:54,622 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:43:54,622 | INFO     | dx_agent             | run_single      | 查询完成，耗时 16.12s，success=True，路由=comparison
+INFO:     113.68.236.219:23168 - "POST /query HTTP/1.1" 200 OK
+INFO:     113.68.236.219:22144 - "GET /health HTTP/1.1" 200 OK
+INFO:     Started server process [8102]
+INFO:     Waiting for application startup.
+2026-06-23 22:56:06,148 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 22:56:06,148 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 22:56:06,148 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 22:56:06,149 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 22:56:06,304 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 22:56:06,823 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 22:56:06,823 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 22:56:06,823 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 22:56:07,025 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 22:56:07,096 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 22:56:07,180 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:56:07,181 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:56:07,189 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 22:56:07,189 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 22:56:07,200 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 22:56:07,201 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.480 seconds.
+2026-06-23 22:56:07,680 | DEBUG    | jieba                | initialize      | Loading model cost 0.480 seconds.
+Prefix dict has been built successfully.
+2026-06-23 22:56:07,680 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 22:56:08,107 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 22:56:08,107 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 22:56:08,107 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 22:56:08,107 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 22:56:08,107 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:37210 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 22:56:36,065 | INFO     | dx_agent             | run_single      | 用户查询: 99和129套餐对比
+2026-06-23 22:56:36,065 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 22:56:36,066 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:56:36,069 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:56:36,313 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:56:36,378 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:56:36,378 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 10 个文档过滤到 5 个
+2026-06-23 22:56:36,378 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 5 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:56:36,378 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 22:57:06,505 | ERROR    | dx_agent             | _fast_path_comparison | 对比快速路径异常: Request timed out.
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_backends/sync.py", line 126, in read
+    with map_exceptions(exc_map):
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 982, in request
+    response = self._client.send(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/dx_agent.py", line 939, in _fast_path_comparison
+    answer = _do_call()
+  File "/root/langchain_rag_code/dx_agent.py", line 203, in wrapper
+    return func(*args, **kwargs)
+  File "/root/langchain_rag_code/dx_agent.py", line 931, in _do_call
+    response = client.chat.completions.create(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1000, in request
+    raise APITimeoutError(request=request) from err
+openai.APITimeoutError: Request timed out.
+2026-06-23 22:57:06,507 | INFO     | dx_agent             | run_single      | 查询完成，耗时 30.44s，success=True，路由=comparison
+INFO:     127.0.0.1:46732 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 22:57:17,700 | INFO     | dx_agent             | run_single      | 用户查询: 99和129套餐对比
+2026-06-23 22:57:17,822 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2026-06-23 22:57:17,823 | WARNING  | dx_agent             | _rewrite_query  | 查询重写失败，使用原查询: Error code: 400 - {'code': 20012, 'message': 'Model does not exist. Please check it carefully.', 'data': None}
+2026-06-23 22:57:17,823 | INFO     | dx_agent             | run_single      | 缓存命中: 99和129套餐对比
+INFO:     127.0.0.1:39018 - "POST /query HTTP/1.1" 200 OK
+INFO:     Started server process [8661]
+INFO:     Waiting for application startup.
+2026-06-23 22:58:08,442 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 22:58:08,442 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 22:58:08,442 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 22:58:08,442 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 22:58:08,595 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 22:58:09,102 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 22:58:09,102 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 22:58:09,102 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 22:58:09,303 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 22:58:09,367 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 22:58:09,449 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:58:09,450 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:58:09,458 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 22:58:09,458 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 22:58:09,469 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 22:58:09,469 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.473 seconds.
+2026-06-23 22:58:09,942 | DEBUG    | jieba                | initialize      | Loading model cost 0.473 seconds.
+Prefix dict has been built successfully.
+2026-06-23 22:58:09,942 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 22:58:10,368 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 22:58:10,368 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 22:58:10,369 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 22:58:10,369 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 22:58:10,369 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     113.68.236.219:20608 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:24000 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47594 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:24192 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21697 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21697 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-06-23 22:58:37,690 | INFO     | dx_agent             | run_single      | 用户查询: 各套餐转网数量对比
+2026-06-23 22:58:37,691 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 22:58:37,691 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:58:37,694 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:58:38,175 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 22:58:38,242 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:58:38,242 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 8 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:58:38,242 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 22:58:39,531 | INFO     | dx_agent             | run_single      | 用户查询: 99和129套餐对比
+2026-06-23 22:58:39,531 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:58:39,534 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:58:39,788 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:58:39,789 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 10 个文档过滤到 5 个
+2026-06-23 22:58:39,789 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 5 个 chunk（向量 10 + BM25 10）
+2026-06-23 22:58:58,682 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:58:58,688 | INFO     | dx_agent             | run_single      | 查询完成，耗时 19.16s，success=True，路由=comparison
+INFO:     127.0.0.1:36354 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 22:59:03,280 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:59:03,281 | INFO     | dx_agent             | run_single      | 查询完成，耗时 25.59s，success=True，路由=comparison
+INFO:     113.68.236.219:21697 - "POST /query HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21697 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 22:59:17,858 | INFO     | dx_agent             | run_single      | 用户查询: 对比99和129套餐
+2026-06-23 22:59:24,165 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 22:59:24,165 | INFO     | dx_agent             | _rewrite_query  | 查询重写: '对比99和129套餐' → '对比99套餐和129套餐的资费、流量、通话、宽带'
+2026-06-23 22:59:24,165 | INFO     | dx_agent             | run_single      | 查询重写: 对比99和129套餐 → 对比99套餐和129套餐的资费、流量、通话、宽带
+2026-06-23 22:59:24,165 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 22:59:24,170 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 22:59:24,425 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 22:59:24,426 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 3 个
+2026-06-23 22:59:24,426 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 3 个 chunk（向量 10 + BM25 10）
+INFO:     113.68.236.219:22529 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 23:00:24,483 | ERROR    | dx_agent             | _fast_path_comparison | 对比快速路径异常: Request timed out.
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_backends/sync.py", line 126, in read
+    with map_exceptions(exc_map):
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 982, in request
+    response = self._client.send(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/dx_agent.py", line 939, in _fast_path_comparison
+    answer = _do_call()
+  File "/root/langchain_rag_code/dx_agent.py", line 203, in wrapper
+    return func(*args, **kwargs)
+  File "/root/langchain_rag_code/dx_agent.py", line 931, in _do_call
+    response = client.chat.completions.create(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/openai/_base_client.py", line 1000, in request
+    raise APITimeoutError(request=request) from err
+openai.APITimeoutError: Request timed out.
+2026-06-23 23:00:24,485 | INFO     | dx_agent             | run_single      | 查询完成，耗时 60.32s，success=True，路由=comparison
+INFO:     113.68.236.219:22721 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:22530 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:22466 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:23618 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21249 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-06-23 23:01:20,275 | INFO     | dx_agent             | run_single      | 用户查询: 对比99和129套餐
+2026-06-23 23:01:24,500 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:01:24,500 | INFO     | dx_agent             | _rewrite_query  | 查询重写: '对比99和129套餐' → '99套餐与129套餐的流量、通话、宽带、月租等对比'
+2026-06-23 23:01:24,500 | INFO     | dx_agent             | run_single      | 查询重写: 对比99和129套餐 → 99套餐与129套餐的流量、通话、宽带、月租等对比
+2026-06-23 23:01:24,500 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:01:24,505 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:01:24,757 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:01:24,758 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 12 个文档过滤到 7 个
+2026-06-23 23:01:24,758 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+INFO:     113.68.236.219:20802 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 23:02:04,160 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:02:04,161 | INFO     | dx_agent             | run_single      | 查询完成，耗时 39.66s，success=True，路由=comparison
+INFO:     113.68.236.219:24128 - "POST /query HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21185 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:23040 - "GET /health HTTP/1.1" 200 OK
+INFO:     Started server process [9076]
+INFO:     Waiting for application startup.
+2026-06-23 23:04:37,224 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:04:37,224 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:04:37,224 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:04:37,224 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:04:37,377 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:04:37,885 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:04:37,885 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 23:04:37,885 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:04:38,084 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:04:38,147 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:04:38,228 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:04:38,230 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:04:38,237 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:04:38,238 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:04:38,249 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:04:38,249 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.472 seconds.
+2026-06-23 23:04:38,721 | DEBUG    | jieba                | initialize      | Loading model cost 0.472 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:04:38,721 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:04:39,139 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:04:39,139 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:04:39,140 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:04:39,140 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:04:39,140 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     113.68.236.219:22336 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:20928 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:21632 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:20610 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21632 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50768 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 23:05:08,298 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐对比99套餐
+2026-06-23 23:05:08,298 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 23:05:08,299 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:05:08,302 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:05:08,638 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:05:08,718 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:05:08,719 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 12 个文档过滤到 10 个
+2026-06-23 23:05:08,719 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 10 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:05:08,719 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:05:13,985 | INFO     | dx_agent             | run_single      | 用户查询: 99和129套餐对比
+2026-06-23 23:05:13,986 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:05:13,988 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:05:14,241 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:05:14,241 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 10 个文档过滤到 4 个
+2026-06-23 23:05:14,241 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:05:18,529 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:05:18,535 | INFO     | dx_agent             | run_single      | 查询完成，耗时 10.24s，success=True，路由=comparison
+INFO:     113.68.236.219:21889 - "POST /query HTTP/1.1" 200 OK
+INFO:     113.68.236.219:23424 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 23:05:38,342 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:05:38,344 | INFO     | dx_agent             | run_single      | 查询完成，耗时 24.36s，success=True，路由=comparison
+INFO:     127.0.0.1:36540 - "POST /query HTTP/1.1" 200 OK
+INFO:     Started server process [9491]
+INFO:     Waiting for application startup.
+2026-06-23 23:07:52,760 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:07:52,760 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:07:52,760 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:07:52,760 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:07:52,912 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:07:53,416 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:07:53,416 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 23:07:53,416 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:07:53,616 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:07:53,679 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:07:53,760 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:07:53,762 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:07:53,769 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:07:53,770 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:07:53,781 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:07:53,781 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.474 seconds.
+2026-06-23 23:07:54,255 | DEBUG    | jieba                | initialize      | Loading model cost 0.474 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:07:54,255 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:07:54,677 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:07:54,678 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:07:54,678 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:07:54,678 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:07:54,678 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+2026-06-23 23:08:17,756 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐对比99套餐
+2026-06-23 23:08:17,756 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 23:08:17,757 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:08:17,760 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:08:18,015 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:08:18,097 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:08:18,098 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 12 个文档过滤到 10 个
+2026-06-23 23:08:18,098 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 10 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:08:18,100 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:08:18,363 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:08:18,363 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 12 个文档过滤到 6 个
+2026-06-23 23:08:18,363 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:08:18,364 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:08:23,299 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:08:23,304 | INFO     | dx_agent             | run_single      | 查询完成，耗时 5.55s，success=True，路由=comparison
+INFO:     127.0.0.1:34352 - "POST /query HTTP/1.1" 200 OK
+INFO:     Started server process [9987]
+INFO:     Waiting for application startup.
+2026-06-23 23:10:45,059 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:10:45,060 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:10:45,060 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:10:45,060 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:10:45,211 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:10:45,715 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:10:45,716 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: deepseek-ai/DeepSeek-V4-Flash
+2026-06-23 23:10:45,716 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:10:45,916 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:10:45,979 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:10:46,062 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:10:46,063 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:10:46,071 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:10:46,071 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:10:46,082 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:10:46,082 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.486 seconds.
+2026-06-23 23:10:46,568 | DEBUG    | jieba                | initialize      | Loading model cost 0.486 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:10:46,568 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:10:46,985 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:10:46,986 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:10:46,986 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:10:46,986 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:10:46,986 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+2026-06-23 23:11:18,529 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐对比99套餐
+2026-06-23 23:11:18,530 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 23:11:18,530 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:11:18,535 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:11:18,806 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:11:18,881 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:11:18,881 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:11:18,882 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:11:18,885 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:11:19,135 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:11:19,136 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 6 个
+2026-06-23 23:11:19,136 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:11:19,136 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+INFO:     113.68.236.219:20992 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:22784 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:24064 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:22720 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:24064 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-06-23 23:11:49,752 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:11:49,758 | INFO     | dx_agent             | run_single      | 查询完成，耗时 31.23s，success=True，路由=comparison
+INFO:     127.0.0.1:52736 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 23:11:57,023 | INFO     | dx_agent             | run_single      | 用户查询: 59套餐对比99套餐
+2026-06-23 23:12:00,627 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:12:00,628 | INFO     | dx_agent             | _rewrite_query  | 查询重写: '59套餐对比99套餐' → '5G畅享59套餐对比5G畅享99套餐'
+2026-06-23 23:12:00,628 | INFO     | dx_agent             | run_single      | 查询重写: 59套餐对比99套餐 → 5G畅享59套餐对比5G畅享99套餐
+2026-06-23 23:12:00,628 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:12:00,632 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:12:00,890 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:12:00,891 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:12:00,891 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:12:00,894 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:12:01,161 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:12:01,161 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 6 个
+2026-06-23 23:12:01,161 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+INFO:     113.68.236.219:22848 - "GET /health HTTP/1.1" 200 OK
+2026-06-23 23:12:16,401 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:12:16,402 | INFO     | dx_agent             | run_single      | 查询完成，耗时 15.77s，success=True，路由=comparison
+INFO:     113.68.236.219:20864 - "POST /query HTTP/1.1" 200 OK
+INFO:     113.68.236.219:23872 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:21504 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     Started server process [11820]
+INFO:     Waiting for application startup.
+2026-06-23 23:29:47,484 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:29:47,484 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:29:47,484 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:29:47,484 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:29:47,640 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:29:48,156 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:29:48,156 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:29:48,156 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:29:48,359 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:29:48,430 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:29:48,513 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:29:48,515 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:29:48,522 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:29:48,523 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:29:48,533 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:29:48,534 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.478 seconds.
+2026-06-23 23:29:49,011 | DEBUG    | jieba                | initialize      | Loading model cost 0.478 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:29:49,011 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:29:49,436 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:29:49,436 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:29:49,437 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:29:49,437 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:29:49,437 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53472 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53488 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:30:34,544 | INFO     | workflow_langchain   | _expand_query_intent | 意图识别: '流量' -> 扩展关键词 '流量 基础 通用 赠送 GB 套餐'
+2026-06-23 23:30:34,544 | INFO     | workflow_langchain   | query           | 查询改写: '59套餐包含多少流量' -> '59套餐包含多少流量 流量 基础 通用 赠送 GB 套餐'
+2026-06-23 23:30:34,544 | INFO     | workflow_langchain   | query           | 查询: 59套餐包含多少流量 流量 基础 通用 赠送 GB 套餐...
+2026-06-23 23:30:34,549 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:30:34,843 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:30:34,920 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:30:34,920 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 10 个文档过滤到 6 个
+2026-06-23 23:30:34,920 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:30:34,920 | INFO     | cache_manager        | get_rerank_cache | Rerank 缓存已初始化
+2026-06-23 23:30:36,353 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 81, in collapse_excgroups
+  |     yield
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 274, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | exceptiongroup.ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    |     return await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 121, in app
+    |     await response(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 273, in __call__
+    |     with collapse_excgroups():
+    |   File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 277, in wrap
+    |     await func()
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 250, in stream_response
+    |     async for chunk in self.body_iterator:
+    |   File "/root/langchain_rag_code/dx_agent_api.py", line 309, in event_generator
+    |     _session_ctx.reset(token)
+    | ValueError: <Token var=<ContextVar name='session_id' default='cli_default' at 0x7f6f1f181a80> at 0x7f6f0c63a340> was created in a different Context
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 121, in app
+    await response(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 273, in __call__
+    with collapse_excgroups():
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 277, in wrap
+    await func()
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 250, in stream_response
+    async for chunk in self.body_iterator:
+  File "/root/langchain_rag_code/dx_agent_api.py", line 309, in event_generator
+    _session_ctx.reset(token)
+ValueError: <Token var=<ContextVar name='session_id' default='cli_default' at 0x7f6f1f181a80> at 0x7f6f0c63a340> was created in a different Context
+INFO:     127.0.0.1:58118 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:30:51,797 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:30:52,057 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:30:52,057 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 11 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:30:52,057 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:30:52,601 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 81, in collapse_excgroups
+  |     yield
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 274, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | exceptiongroup.ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    |     return await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 121, in app
+    |     await response(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 273, in __call__
+    |     with collapse_excgroups():
+    |   File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 277, in wrap
+    |     await func()
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 250, in stream_response
+    |     async for chunk in self.body_iterator:
+    |   File "/root/langchain_rag_code/dx_agent_api.py", line 309, in event_generator
+    |     _session_ctx.reset(token)
+    | ValueError: <Token var=<ContextVar name='session_id' default='cli_default' at 0x7f6f1f181a80> at 0x7f6f02016c80> was created in a different Context
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 121, in app
+    await response(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 273, in __call__
+    with collapse_excgroups():
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 277, in wrap
+    await func()
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 250, in stream_response
+    async for chunk in self.body_iterator:
+  File "/root/langchain_rag_code/dx_agent_api.py", line 309, in event_generator
+    _session_ctx.reset(token)
+ValueError: <Token var=<ContextVar name='session_id' default='cli_default' at 0x7f6f1f181a80> at 0x7f6f02016c80> was created in a different Context
+INFO:     Started server process [12414]
+INFO:     Waiting for application startup.
+2026-06-23 23:32:28,740 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:32:28,740 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:32:28,740 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:32:28,741 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:32:28,894 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:32:29,404 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:32:29,404 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:32:29,404 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:32:29,606 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:32:29,673 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:32:29,755 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:32:29,757 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:32:29,764 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:32:29,765 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:32:29,776 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:32:29,776 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.477 seconds.
+2026-06-23 23:32:30,252 | DEBUG    | jieba                | initialize      | Loading model cost 0.477 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:32:30,252 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:32:30,666 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:32:30,666 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:32:30,666 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:32:30,666 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:32:30,666 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50322 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50114 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:33:09,037 | ERROR    | dx_agent_api         | event_generator | 流式查询异常: name 'unique' is not defined
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/dx_agent_api.py", line 170, in event_generator
+    if len(unique) >= 2:
+NameError: name 'unique' is not defined
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 81, in collapse_excgroups
+  |     yield
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 274, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | exceptiongroup.ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    |     return await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    |     await self.app(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 121, in app
+    |     await response(scope, receive, send)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 273, in __call__
+    |     with collapse_excgroups():
+    |   File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    |     raise exc
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 277, in wrap
+    |     await func()
+    |   File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 250, in stream_response
+    |     async for chunk in self.body_iterator:
+    |   File "/root/langchain_rag_code/dx_agent_api.py", line 309, in event_generator
+    |     _session_ctx.reset(token)
+    | ValueError: <Token var=<ContextVar name='session_id' default='cli_default' at 0x7f9eeae01850> at 0x7f9ed98e2700> was created in a different Context
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/fastapi/routing.py", line 121, in app
+    await response(scope, receive, send)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 273, in __call__
+    with collapse_excgroups():
+  File "/usr/lib/python3.10/contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 277, in wrap
+    await func()
+  File "/root/langchain_rag_code/venv/lib/python3.10/site-packages/starlette/responses.py", line 250, in stream_response
+    async for chunk in self.body_iterator:
+  File "/root/langchain_rag_code/dx_agent_api.py", line 309, in event_generator
+    _session_ctx.reset(token)
+ValueError: <Token var=<ContextVar name='session_id' default='cli_default' at 0x7f9eeae01850> at 0x7f9ed98e2700> was created in a different Context
+INFO:     Started server process [12781]
+INFO:     Waiting for application startup.
+2026-06-23 23:33:50,988 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:33:50,988 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:33:50,988 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:33:50,988 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:33:51,143 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:33:51,656 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:33:51,656 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:33:51,656 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:33:51,857 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:33:51,922 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:33:52,004 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:33:52,006 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:33:52,014 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:33:52,014 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:33:52,025 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:33:52,025 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.483 seconds.
+2026-06-23 23:33:52,508 | DEBUG    | jieba                | initialize      | Loading model cost 0.483 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:33:52,508 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:33:52,925 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:33:52,925 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:33:52,926 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:33:52,926 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:33:52,926 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     Started server process [12859]
+INFO:     Waiting for application startup.
+2026-06-23 23:34:10,817 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:34:10,817 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:34:10,817 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:34:10,817 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:34:10,969 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:34:11,475 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:34:11,475 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:34:11,475 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:34:11,673 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:34:11,735 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:34:11,817 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:34:11,819 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:34:11,826 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:34:11,827 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:34:11,837 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:34:11,838 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.472 seconds.
+2026-06-23 23:34:12,310 | DEBUG    | jieba                | initialize      | Loading model cost 0.472 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:34:12,310 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:34:12,736 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:34:12,736 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:34:12,736 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:34:12,736 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:34:12,736 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8002): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     127.0.0.1:50316 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:34:28,311 | ERROR    | dx_agent_api         | event_generator | 流式查询异常: name 'unique' is not defined
+Traceback (most recent call last):
+  File "/root/langchain_rag_code/dx_agent_api.py", line 170, in event_generator
+    if len(unique) >= 2:
+NameError: name 'unique' is not defined
+INFO:     Started server process [13101]
+INFO:     Waiting for application startup.
+2026-06-23 23:34:56,670 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:34:56,670 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:34:56,670 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:34:56,670 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:34:56,825 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:34:57,341 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:34:57,341 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:34:57,341 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:34:57,544 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:34:57,610 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:34:57,693 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:34:57,694 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:34:57,702 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:34:57,703 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:34:57,713 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:34:57,713 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.481 seconds.
+2026-06-23 23:34:58,195 | DEBUG    | jieba                | initialize      | Loading model cost 0.481 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:34:58,195 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:34:58,622 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:34:58,622 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:34:58,622 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:34:58,622 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:34:58,623 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57466 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:35:15,495 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:35:15,761 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:35:15,835 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:35:15,835 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:35:15,836 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:35:15,839 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:35:16,076 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:35:16,076 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 6 个
+2026-06-23 23:35:16,077 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:35:16,077 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:35:16,551 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:51780 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:35:31,533 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:35:31,795 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:35:31,795 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:35:31,795 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:35:31,799 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:35:32,033 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:35:32,033 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 6 个
+2026-06-23 23:35:32,033 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:35:32,292 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:51518 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:35:46,936 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:35:47,209 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:35:47,209 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:35:47,209 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:35:47,213 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:35:47,451 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:35:47,451 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 6 个
+2026-06-23 23:35:47,451 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 6 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:35:47,696 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     Started server process [13788]
+INFO:     Waiting for application startup.
+2026-06-23 23:38:14,240 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:38:14,241 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:38:14,241 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:38:14,241 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:38:14,398 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:38:14,909 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:38:14,909 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:38:14,909 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:38:15,111 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:38:15,176 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:38:15,258 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:38:15,259 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:38:15,267 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:38:15,267 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:38:15,278 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:38:15,278 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.477 seconds.
+2026-06-23 23:38:15,755 | DEBUG    | jieba                | initialize      | Loading model cost 0.477 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:38:15,755 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:38:16,179 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:38:16,179 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:38:16,179 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:38:16,180 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:38:16,180 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52178 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:38:39,244 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:38:39,509 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:38:39,590 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:38:39,591 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 6 个文档过滤到 5 个
+2026-06-23 23:38:39,591 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 5 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:38:39,595 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:38:39,815 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:38:39,816 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 8 个文档过滤到 5 个
+2026-06-23 23:38:39,816 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 5 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:38:39,816 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:38:40,252 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     Started server process [14266]
+INFO:     Waiting for application startup.
+2026-06-23 23:40:25,555 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:40:25,555 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:40:25,556 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:40:25,556 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:40:25,709 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:40:26,215 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:40:26,215 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:40:26,215 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:40:26,416 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:40:26,483 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:40:26,565 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:40:26,567 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:40:26,574 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:40:26,575 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:40:26,586 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:40:26,586 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.481 seconds.
+2026-06-23 23:40:27,066 | DEBUG    | jieba                | initialize      | Loading model cost 0.481 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:40:27,067 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:40:27,492 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:40:27,492 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:40:27,492 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:40:27,492 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:40:27,492 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53582 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:40:47,171 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:40:47,429 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:40:47,494 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:40:47,494 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:40:47,494 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:40:47,498 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:40:47,730 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:40:47,731 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 9 个文档过滤到 7 个
+2026-06-23 23:40:47,731 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:40:47,731 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:40:48,274 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     Started server process [14496]
+INFO:     Waiting for application startup.
+2026-06-23 23:41:45,807 | INFO     | dx_agent_api         | startup         | 正在预热 dx_agent ...
+2026-06-23 23:41:45,807 | INFO     | dx_agent             | _create         | 初始化 RAGWorkflow ...
+2026-06-23 23:41:45,807 | INFO     | workflow_langchain   | __init__        | 初始化RAG工作流...
+2026-06-23 23:41:45,807 | INFO     | workflow_langchain   | _init_embedding | 初始化本地嵌入模型...
+2026-06-23 23:41:45,960 | INFO     | workflow_langchain   | _init_embedding | 本地嵌入模型加载成功
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+2026-06-23 23:41:46,460 | INFO     | workflow_langchain   | _ensure_langchain_imports | langchain 组件延迟导入完成
+2026-06-23 23:41:46,460 | INFO     | workflow_langchain   | _init_llm       | 初始化LLM模型: THUDM/GLM-4-32B-0414
+2026-06-23 23:41:46,460 | INFO     | workflow_langchain   | _init_llm       | LLM API: https://api.siliconflow.cn/v1
+2026-06-23 23:41:46,660 | INFO     | workflow_langchain   | _init_vectorstore | 初始化向量数据库: /root/langchain_rag_code/vector_db
+2026-06-23 23:41:46,722 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-06-23 23:41:46,804 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:41:46,805 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:41:46,813 | INFO     | workflow_langchain   | _init_vectorstore | 向量库加载成功，文档块数量: 685
+2026-06-23 23:41:46,813 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+Building prefix dict from the default dictionary ...
+2026-06-23 23:41:46,824 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+Loading model from cache /tmp/jieba.cache
+2026-06-23 23:41:46,824 | DEBUG    | jieba                | initialize      | Loading model from cache /tmp/jieba.cache
+Loading model cost 0.474 seconds.
+2026-06-23 23:41:47,298 | DEBUG    | jieba                | initialize      | Loading model cost 0.474 seconds.
+Prefix dict has been built successfully.
+2026-06-23 23:41:47,298 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-06-23 23:41:47,723 | INFO     | workflow_langchain   | __init__        | BM25 检索器初始化完成，文档数: 685
+2026-06-23 23:41:47,723 | INFO     | workflow_langchain   | _init_qa_chain  | 初始化检索问答链...
+2026-06-23 23:41:47,724 | INFO     | workflow_langchain   | _init_qa_chain  | QA链初始化完成
+2026-06-23 23:41:47,724 | INFO     | workflow_langchain   | __init__        | RAG工作流初始化完成
+2026-06-23 23:41:47,724 | INFO     | dx_agent_api         | startup         | dx_agent 预热完成
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:38448 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:42:03,131 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:42:03,412 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+2026-06-23 23:42:03,488 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:42:03,488 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 4 个文档过滤到 4 个
+2026-06-23 23:42:03,488 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:42:03,492 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:42:03,734 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:42:03,735 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 10 个文档过滤到 7 个
+2026-06-23 23:42:03,735 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:42:03,735 | INFO     | dx_agent             | _create         | 初始化 OpenAI 客户端: https://api.siliconflow.cn/v1
+2026-06-23 23:42:04,305 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     113.68.236.219:20544 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:23361 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:23616 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:21249 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:24512 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-06-23 23:44:27,769 | INFO     | dx_agent             | run_single      | 用户查询: 对比99和129套餐
+2026-06-23 23:44:27,769 | INFO     | cache_manager        | get_query_cache | 查询缓存已初始化 (TTL=600s, MaxSize=1000)
+2026-06-23 23:44:27,770 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:44:27,774 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:44:27,996 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:44:27,996 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 10 个文档过滤到 7 个
+2026-06-23 23:44:27,996 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:44:28,000 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:44:28,262 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:44:28,262 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '129元' 从 11 个文档过滤到 10 个
+2026-06-23 23:44:28,262 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 10 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:44:32,420 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:44:32,425 | INFO     | dx_agent             | run_single      | 查询完成，耗时 4.65s，success=True，路由=comparison
+INFO:     113.68.236.219:24512 - "POST /query HTTP/1.1" 200 OK
+2026-06-23 23:44:43,969 | INFO     | dx_agent             | run_single      | 用户查询: 129套餐跟199套餐对比
+2026-06-23 23:44:45,153 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:44:45,153 | INFO     | dx_agent             | _rewrite_query  | 查询重写: '129套餐跟199套餐对比' → '129套餐和199套餐对比'
+2026-06-23 23:44:45,153 | INFO     | dx_agent             | run_single      | 查询重写: 129套餐跟199套餐对比 → 129套餐和199套餐对比
+2026-06-23 23:44:45,154 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:44:45,159 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:44:45,422 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:44:45,422 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '129元' 从 11 个文档过滤到 10 个
+2026-06-23 23:44:45,422 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 10 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:44:45,426 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:44:45,666 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:44:45,667 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '199元' 从 11 个文档过滤到 8 个
+2026-06-23 23:44:45,667 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 8 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:44:50,129 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:44:50,129 | INFO     | dx_agent             | run_single      | 查询完成，耗时 4.98s，success=True，路由=comparison
+INFO:     113.68.236.219:20610 - "POST /query HTTP/1.1" 200 OK
+INFO:     113.68.236.219:23168 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59262 - "POST /api/query/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51454 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54570 - "POST /api/query/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48354 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:46:52,295 | INFO     | workflow_langchain   | query           | 查询: 你好...
+2026-06-23 23:46:52,297 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 0 个 chunk
+2026-06-23 23:46:52,544 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:46:52,544 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 2 个 chunk（向量 10 + BM25 0）
+2026-06-23 23:46:52,544 | INFO     | cache_manager        | get_rerank_cache | Rerank 缓存已初始化
+2026-06-23 23:46:53,608 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:40768 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:54:13,112 | INFO     | workflow_langchain   | query           | 查询: 129套餐有什么...
+2026-06-23 23:54:13,115 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:54:13,398 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:54:13,399 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '129元' 从 13 个文档过滤到 10 个
+2026-06-23 23:54:13,399 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 10 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:54:16,683 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     8.155.87.73:59109 - "GET /static/web_ui.html HTTP/1.1" 200 OK
+INFO:     8.155.87.73:59109 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:22976 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:21888 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     113.68.236.219:23936 - "GET /health HTTP/1.1" 200 OK
+INFO:     113.68.236.219:24000 - "GET /stats HTTP/1.1" 200 OK
+INFO:     113.68.236.219:23936 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2026-06-23 23:55:18,723 | INFO     | dx_agent             | run_single      | 用户查询: 各套餐转网数量对比
+2026-06-23 23:55:22,452 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:55:22,453 | INFO     | dx_agent             | _rewrite_query  | 查询重写: '各套餐转网数量对比' → '99套餐、129套餐、199套餐转网数量对比'
+2026-06-23 23:55:22,453 | INFO     | dx_agent             | run_single      | 查询重写: 各套餐转网数量对比 → 99套餐、129套餐、199套餐转网数量对比
+2026-06-23 23:55:22,453 | INFO     | dx_agent             | run_single      | comparison: 对比快速路径
+2026-06-23 23:55:22,457 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:55:22,690 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:55:22,691 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '99元' 从 10 个文档过滤到 7 个
+2026-06-23 23:55:22,691 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:55:22,694 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:55:22,939 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:55:22,939 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '129元' 从 11 个文档过滤到 10 个
+2026-06-23 23:55:22,939 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 10 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:55:22,942 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:55:23,158 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:55:23,159 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '199元' 从 11 个文档过滤到 8 个
+2026-06-23 23:55:23,159 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 8 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:55:25,083 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-23 23:55:25,084 | INFO     | dx_agent             | run_single      | 查询完成，耗时 2.63s，success=True，路由=comparison
+INFO:     113.68.236.219:23936 - "POST /query HTTP/1.1" 200 OK
+INFO:     8.155.87.73:22045 - "GET /static/web_ui.html HTTP/1.1" 200 OK
+INFO:     8.155.87.73:22045 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:20325 - "GET /stats HTTP/1.1" 200 OK
+INFO:     8.155.87.73:46789 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-23 23:59:26,897 | INFO     | workflow_langchain   | _expand_query_intent | 意图识别: '流量' -> 扩展关键词 '流量 基础 通用 赠送 GB 套餐'
+2026-06-23 23:59:26,897 | INFO     | workflow_langchain   | query           | 查询改写: '59套餐流量' -> '59套餐流量 流量 基础 通用 赠送 GB 套餐'
+2026-06-23 23:59:26,897 | INFO     | workflow_langchain   | query           | 查询: 59套餐流量 流量 基础 通用 赠送 GB 套餐...
+2026-06-23 23:59:26,900 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-23 23:59:27,418 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-23 23:59:27,418 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '59元' 从 11 个文档过滤到 7 个
+2026-06-23 23:59:27,418 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 7 个 chunk（向量 10 + BM25 10）
+2026-06-23 23:59:29,404 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     8.155.87.73:15645 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:62417 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:54948 - "GET /static/web_ui.html HTTP/1.1" 200 OK
+INFO:     8.155.87.73:54948 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:42040 - "GET /stats HTTP/1.1" 200 OK
+INFO:     8.155.87.73:42736 - "POST /query/stream HTTP/1.1" 200 OK
+2026-06-24 00:00:56,393 | INFO     | workflow_langchain   | _expand_query_intent | 意图识别: '宽带' -> 扩展关键词 '宽带 安装 融合 兆'
+2026-06-24 00:00:56,393 | INFO     | workflow_langchain   | query           | 查询改写: '129套餐宽带' -> '129套餐宽带 宽带 安装 融合 兆'
+2026-06-24 00:00:56,393 | INFO     | workflow_langchain   | query           | 查询: 129套餐宽带 宽带 安装 融合 兆...
+2026-06-24 00:00:56,396 | INFO     | workflow_langchain   | _bm25_search    | BM25 检索命中: 10 个 chunk
+2026-06-24 00:00:56,639 | INFO     | workflow_langchain   | _vector_search  | 向量检索命中: 10 个 chunk
+2026-06-24 00:00:56,640 | INFO     | workflow_langchain   | _hybrid_search  | 套餐档位过滤: '129元' 从 7 个文档过滤到 4 个
+2026-06-24 00:00:56,640 | INFO     | workflow_langchain   | _hybrid_search  | 检索完成: 4 个 chunk（向量 10 + BM25 10）
+2026-06-24 00:00:58,479 | INFO     | httpx                | _send_single_request | HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:     8.155.87.73:42736 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:18526 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:23795 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:8467 - "GET /health HTTP/1.1" 200 OK
+INFO:     8.155.87.73:13037 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [14496]
