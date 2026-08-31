@@ -430,7 +430,7 @@ def main():
 
     all_records = []
 
-    for f in sorted(glob.glob('eval_simple_rag_*.json')):
+    for f in sorted(glob.glob('evaluation/results/eval_simple_rag_*.json')):
         try:
             r = load_simple_rag(f)
             if r:
@@ -438,7 +438,7 @@ def main():
         except Exception as e:
             print(f"⚠️ {f}: {e}")
 
-    for f in sorted(glob.glob('eval_dx_agent_*.json')):
+    for f in sorted(glob.glob('evaluation/results/eval_dx_agent_*.json')):
         try:
             r = load_dx_agent(f)
             if r:
