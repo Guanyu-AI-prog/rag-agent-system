@@ -52,18 +52,19 @@ def load_simple_rag(filepath):
     if has_detailed:
         passed = sum(1 for r in results if r.get('total', 0) >= 6.0)
         avg_total = np.mean([r.get('total', 0) for r in results])
-        avg_accuracy = np.mean([r.get('accuracy', 0) for r in results])
-        avg_completeness = np.mean([r.get('completeness', 0) for r in results])
-        avg_hallucination = np.mean([r.get('hallucination', 0) for r in results])
-        avg_recall = np.mean([r.get('recall', 0) for r in results])
+        # accuracy/completeness/hallucination/recall 都是0-10分制，转0-100
+        avg_accuracy = np.mean([r.get('accuracy', 0) for r in results]) * 10
+        avg_completeness = np.mean([r.get('completeness', 0) for r in results]) * 10
+        avg_hallucination = np.mean([r.get('hallucination', 0) for r in results]) * 10
+        avg_recall = np.mean([r.get('recall', 0) for r in results]) * 10
     else:
         passed = sum(1 for r in results if r.get('passed', False))
         avg_hit = np.mean([r.get('hit_rate', 0) for r in results])
         avg_total = avg_hit * 10
-        avg_accuracy = avg_hit * 5
-        avg_completeness = avg_hit * 5
-        avg_hallucination = 5.0
-        avg_recall = avg_hit * 5
+        avg_accuracy = avg_hit * 100
+        avg_completeness = avg_hit * 100
+        avg_hallucination = 100.0
+        avg_recall = avg_hit * 100
 
     avg_elapsed = np.mean([r.get('elapsed', 0) for r in results])
     total = len(results)
@@ -124,10 +125,10 @@ def load_dx_agent(filepath):
         'pass_rate': stats.get('pass_rate', passed / total * 100),
         'avg_elapsed': avg_elapsed,
         'avg_hit_rate': avg_hit_rate,
-        'avg_accuracy': avg_hit * 5,
-        'avg_completeness': avg_hit * 5,
-        'avg_hallucination': 5.0,
-        'avg_recall': avg_hit * 5,
+        'avg_accuracy': avg_hit * 100,
+        'avg_completeness': avg_hit * 100,
+        'avg_hallucination': 100.0,
+        'avg_recall': avg_hit * 100,
         'type_pass_rate': type_pass_rate,
         'type_elapsed': {k: np.mean(v) for k, v in type_elapsed.items()},
     }
@@ -207,10 +208,10 @@ def plot_radar(records, output_path):
             continue
         latest = recs[-1]
         values = [
-            latest.get('avg_accuracy', 0) * 20,
-            latest.get('avg_completeness', 0) * 20,
-            latest.get('avg_hallucination', 0) * 20,
-            latest.get('avg_recall', 0) * 20,
+            latest.get('avg_accuracy', 0),
+            latest.get('avg_completeness', 0),
+            latest.get('avg_hallucination', 0),
+            latest.get('avg_recall', 0),
             max(0, 100 - latest.get('avg_elapsed', 0) * 5),
         ]
         values += values[:1]
@@ -381,19 +382,19 @@ def plot_scheme_comparison(records, output_path):
         latest = sr[-1]
         sr_vals = [
             latest.get('pass_rate', 0),
-            latest.get('avg_accuracy', 0) * 20,
-            latest.get('avg_completeness', 0) * 20,
-            latest.get('avg_hallucination', 0) * 20,
-            latest.get('avg_recall', 0) * 20,
+            latest.get('avg_accuracy', 0),
+            latest.get('avg_completeness', 0),
+            latest.get('avg_hallucination', 0),
+            latest.get('avg_recall', 0),
         ]
     if dx:
         latest = dx[-1]
         dx_vals = [
             latest.get('pass_rate', 0),
-            latest.get('avg_accuracy', 0) * 20,
-            latest.get('avg_completeness', 0) * 20,
-            latest.get('avg_hallucination', 0) * 20,
-            latest.get('avg_recall', 0) * 20,
+            latest.get('avg_accuracy', 0),
+            latest.get('avg_completeness', 0),
+            latest.get('avg_hallucination', 0),
+            latest.get('avg_recall', 0),
         ]
 
     x = np.arange(len(metrics))
