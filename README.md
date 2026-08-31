@@ -159,6 +159,37 @@ curl -X POST "http://localhost:8000/batch_query" \
   -d '["有哪些套餐？", "流量怎么算？"]'
 ```
 
+## 📊 评测数据可视化
+
+> 由 `visualize_eval.py` 自动生成，数据来自8份迭代评测记录。
+
+### 各题型表现
+![题型得分](docs/images/01_question_type_scores.png)
+
+### 综合能力雷达图
+![雷达图](docs/images/02_capability_radar.png)
+
+### 通过率 & 响应时间趋势
+![趋势图](docs/images/03_trends.png)
+
+### 调优前后效果对比
+![调优对比](docs/images/04_before_after.png)
+
+### 纯RAG vs 纯Python Agent 对比
+![方案对比](docs/images/05_scheme_comparison.png)
+
+### 评测文件说明
+
+| 文件 | 说明 |
+|------|------|
+| `eval_simple_rag.py` | 纯RAG评测脚本（5维度打分） |
+| `eval_dx_agent.py` | 纯Python Agent评测脚本 |
+| `eval_simple_rag_*.json` | RAG评测结果（4次迭代） |
+| `eval_dx_agent_*.json` | Agent评测结果（4次迭代） |
+| `test_questions.py` | 30道标准测试题库 |
+| `benchmark.py` | RAG API并发压测脚本 |
+| `visualize_eval.py` | 评测数据可视化脚本 |
+
 ## 🐛 常见问题
 
 ### Q: 启动时报错"SILICONFLOW_API_KEY未设置"

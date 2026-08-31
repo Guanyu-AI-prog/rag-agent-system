@@ -25250,3 +25250,25 @@ pip install python-multipart
 {"timestamp": "2026-08-24T17:34:01.097178+00:00", "level": "INFO", "logger": "simple_rag", "message": "BM25 检索命中: 10 个", "trace_id": "74103f5ba19d43fb", "session_id": ""}
 {"timestamp": "2026-08-24T17:34:01.534128+00:00", "level": "INFO", "logger": "simple_rag", "message": "检索完成: 向量 10 + BM25 10 → 6 个", "trace_id": "74103f5ba19d43fb", "session_id": ""}
 {"timestamp": "2026-08-24T17:34:37.562237+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST https://api.siliconflow.cn/v1/chat/completions \"HTTP/1.1 200 OK\"", "trace_id": "74103f5ba19d43fb", "session_id": ""}
+2026-08-25 14:30:25,814 | INFO     | root                 | shutdown_event  | 关闭RAG API服务...
+2026-08-31 14:00:39,648 | INFO     | root                 | <module>        | 静态文件目录已挂载: static
+2026-08-31 14:00:39,775 | INFO     | root                 | startup_event   | 启动RAG API服务（纯Python模式）...
+2026-08-31 14:00:39,775 | INFO     | simple_rag           | __init__        | 初始化 RAG 系统...
+2026-08-31 14:00:40,095 | INFO     | chromadb.telemetry.product.posthog | __init__        | Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-08-31 14:00:40,365 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+2026-08-31 14:00:40,403 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+2026-08-31 14:00:40,420 | INFO     | simple_rag           | create_or_load  | 向量库加载成功，文档数: 254
+2026-08-31 14:00:40,421 | ERROR    | chromadb.telemetry.product.posthog | _direct_capture | Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+2026-08-31 14:00:40,517 | DEBUG    | jieba                | initialize      | Building prefix dict from the default dictionary ...
+2026-08-31 14:00:41,003 | DEBUG    | jieba                | initialize      | Dumping model to file cache /tmp/jieba.cache
+2026-08-31 14:00:41,049 | DEBUG    | jieba                | initialize      | Loading model cost 0.532 seconds.
+2026-08-31 14:00:41,049 | DEBUG    | jieba                | initialize      | Prefix dict has been built successfully.
+2026-08-31 14:00:41,266 | INFO     | simple_rag           | __init__        | BM25 检索器初始化完成，文档数: 254
+2026-08-31 14:00:41,266 | INFO     | simple_rag           | _init_bm25      | BM25 索引初始化完成，文档数: 254
+2026-08-31 14:00:41,266 | INFO     | simple_rag           | __init__        | RAG 系统初始化完成
+2026-08-31 14:00:41,266 | INFO     | conversation_history | __init__        | 会话存储: 内存存储 (max_sessions=1000, ttl=1800s)
+2026-08-31 14:00:41,266 | INFO     | root                 | startup_event   | 会话管理器已初始化 | 最大历史: 5轮 | TTL: 1800秒
+2026-08-31 14:00:41,267 | INFO     | root                 | startup_event   | 查询日志模块已初始化
+2026-08-31 14:00:41,267 | INFO     | root                 | startup_event   | 缓存监控任务已创建
+2026-08-31 14:00:41,269 | INFO     | root                 | _load_shortcut_cache_file | 从文件加载快捷问答缓存: 6 条
+2026-08-31 14:00:41,269 | INFO     | root                 | startup_event   | 服务初始化完成（纯Python RAG模式），缓存TTL: 600秒，最大工作线程: 8
