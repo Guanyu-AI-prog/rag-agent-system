@@ -1,163 +1,115 @@
-# LangChain RAG代码实现
+# RAG Agent System
 
-本目录包含基于LangChain的RAG系统完整实现，可直接用于生产环境。
+纯Python RAG + Agent系统，支持知识库问答、工具调用、费用计算。正在逐步去除LangChain依赖。
 
-## 📁 目录结构
+## 📁 项目结构
 
 ```
-code/
-├── config.py                # 系统配置管理
-├── workflow_langchain.py    # 核心RAG工作流
-├── api.py                   # FastAPI服务接口
-├── build_vectors.py         # 向量库构建脚本
-├── test_system.py           # 系统测试脚本
-├── start.sh                 # 快速启动脚本
-├── requirements.txt         # Python依赖
-├── .env.example             # 环境变量示例
-├── README.md                # 本文件
-└── data/                    # 示例知识库数据
-    └── sample_telecom.txt   # 电信套餐示例数据
+rag-agent-system/
+├── simple_rag.py              # 纯RAG实现（向量检索 + BM25 + Rerank）
+├── dx_agent.py                # 纯Python Agent（正则匹配工具调用，无LangChain）
+├── taocan_agent.py            # LangChain Agent（Tool Calling，逐步废弃）
+├── api.py                     # FastAPI服务（RAG模式）
+├── api_agent.py               # FastAPI服务（Agent模式）
+├── dx_agent_api.py            # FastAPI服务（纯Python Agent模式）
+├── config.py                  # 系统配置
+├── config_manager.py          # 配置管理器
+├── build_vectors.py           # 向量库构建脚本
+├── local_embeddings.py        # 本地Embedding（优先本地，API兜底）
+├── conversation_history.py    # 对话历史管理
+├── cache_manager.py           # 缓存管理
+├── circuit_breaker.py         # 熔断器
+├── rate_limiter.py            # 限流器
+├── metrics.py                 # 指标收集
+├── query_logger.py            # 查询日志
+├── structured_logging.py      # 结构化日志
+├── voice_api.py               # 语音API
+├── voice_module.py            # 语音模块
+├── workflow_langchain.py      # LangChain RAG工作流（旧）
+├── gunicorn.conf.py           # Gunicorn配置
+├── start.sh                   # 启动脚本
+├── requirements.txt           # 完整依赖
+├── requirements_pure.txt      # 精简依赖（无LangChain）
+├── .env.example               # 环境变量示例
+├── visualize_eval.py          # 评测数据可视化脚本
+├── data/                      # 知识库源数据
+├── docs/                      # 文档
+│   └── images/                # 评测图表
+├── static/                    # Web UI
+├── eval_*.py                  # 评测脚本
+├── eval_*.json                # 评测结果
+└── test_*.py                  # 测试脚本
 ```
 
 ## 🚀 快速开始
 
-### 1. 环境准备
+### 1. 安装依赖
 
 ```bash
-# 进入代码目录
-cd code/
-
-# 创建虚拟环境（推荐）
+# 创建虚拟环境
 python3 -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
+source venv/bin/activate
 
-# 安装依赖
-pip install -r requirements.txt
+# 安装依赖（二选一）
+pip install -r requirements.txt        # 完整版（含LangChain）
+pip install -r requirements_pure.txt   # 精简版（纯Python Agent用）
 ```
 
 ### 2. 配置环境变量
 
 ```bash
-# 复制示例配置
 cp .env.example .env
-
-# 编辑配置文件，填入你的SiliconFlow API密钥
-# Linux/Mac: nano .env
-# Windows: notepad .env
+# 编辑 .env，填入API密钥
 ```
 
-**必需配置：**
-```env
-SILICONFLOW_API_KEY=sk-your-siliconflow-api-key-here
-LLM_MODEL=THUDM/GLM-4-9B-0414
-EMBED_MODEL=BAAI/bge-large-zh-v1.5
-```
-
-### 3. 构建向量数据库
+### 3. 构建向量库
 
 ```bash
-# 方法1：使用启动脚本
-./start.sh build
-
-# 方法2：直接运行脚本
 python build_vectors.py --force
 ```
 
-### 4. 启动API服务
+### 4. 启动服务
 
 ```bash
-# 方法1：使用启动脚本
-./start.sh run
-
-# 方法2：直接运行
+# RAG模式
 python api.py
+
+# Agent模式
+python api_agent.py
+
+# 纯Python Agent模式
+python dx_agent_api.py
 ```
 
-### 5. 测试系统
+### 5. 测试
 
 ```bash
-# 方法1：使用启动脚本测试
-./start.sh test
+# 命令行查询
+python simple_rag.py "有哪些套餐？"
+python dx_agent.py "59元套餐多少流量？"
 
-# 方法2：运行测试脚本
+# 运行测试脚本
 python test_system.py
-
-# 方法3：命令行查询
-python workflow_langchain.py "有哪些套餐？"
 ```
 
-## 🔧 核心组件说明
+## 🔧 核心组件
 
-### 1. config.py - 配置管理
-- 统一管理所有配置项
-- 支持环境变量和默认值
-- 包含配置验证功能
+### 纯RAG（simple_rag.py）
 
-### 2. workflow_langchain.py - RAG工作流
-- 文档加载和分割
-- 向量化和存储
-- 检索和生成
-- 支持批量查询
+- 向量检索（Chroma） + BM25 混合检索 + Rerank重排序
+- 本地Embedding优先，API兜底
+- 缓存、熔断、限流、指标收集
 
-### 3. api.py - API服务
-- RESTful接口
-- 内存缓存（5分钟TTL）
-- 跨域支持
-- 异步处理
+### 纯Python Agent（dx_agent.py）
 
-### 4. build_vectors.py - 向量库构建
-- 支持增量更新
-- 文档分割配置
-- 元数据生成
+- 纯Python实现，正则匹配LLM输出解析工具调用
+- 3个工具：套餐知识查询、费用计算器、套餐统计
+- 无LangChain依赖
 
-## 📊 性能优化建议
+### LangChain Agent（taocan_agent.py）
 
-### 4核8GB服务器配置
-```env
-MAX_WORKERS=2           # 线程池大小
-CACHE_TTL=300          # 缓存时间（秒）
-CHUNK_SIZE=500         # 文本分块大小
-RETRIEVAL_K=3          # 检索文档数量
-```
-
-### 模型选择策略
-```env
-# 快速响应（推荐客服场景）
-LLM_MODEL=THUDM/GLM-4-9B-0414  # 响应时间：4秒
-
-# 高质量响应（复杂分析）
-LLM_MODEL=deepseek-ai/DeepSeek-V4-Flash  # 响应时间：25-33秒
-```
-
-## 🧪 API接口文档
-
-启动服务后访问：http://localhost:8000/docs
-
-### 主要接口：
-
-| 接口 | 方法 | 说明 |
-|------|------|------|
-| `/` | GET | 服务信息 |
-| `/health` | GET | 健康检查 |
-| `/stats` | GET | 系统统计 |
-| `/query` | POST | 单个查询 |
-| `/batch_query` | POST | 批量查询 |
-| `/cache/clear` | POST | 清空缓存 |
-
-### 查询示例：
-
-```bash
-# 单个查询
-curl -X POST "http://localhost:8000/query" \
-  -H "Content-Type: application/json" \
-  -d '{"question": "有哪些套餐？"}'
-
-# 批量查询
-curl -X POST "http://localhost:8000/batch_query" \
-  -H "Content-Type: application/json" \
-  -d '["有哪些套餐？", "流量怎么算？"]'
-```
+- LangChain AgentExecutor + Tool Calling
+- 正在逐步被dx_agent.py替代
 
 ## 📊 评测数据可视化
 
@@ -192,72 +144,35 @@ curl -X POST "http://localhost:8000/batch_query" \
 
 ## 🐛 常见问题
 
-### Q: 启动时报错"SILICONFLOW_API_KEY未设置"
-**A:** 请确保已创建`.env`文件并填入有效的API密钥。
+**Q: 启动时报错"SILICONFLOW_API_KEY未设置"**
+A: 请确保已创建`.env`文件并填入有效的API密钥。
 
-### Q: 查询返回"向量库未初始化"
-**A:** 请先运行`python build_vectors.py --force`构建向量库。
+**Q: 查询返回"向量库未初始化"**
+A: 请先运行`python build_vectors.py --force`构建向量库。
 
-### Q: 响应时间太长（超过30秒）
-**A:** 1. 检查是否使用了正确的LLM模型
-   2. 考虑启用缓存（默认已启用）
-   3. 检查服务器网络连接
+**Q: 响应时间太长（超过30秒）**
+A: 1. 检查LLM模型配置 2. 启用缓存（默认已启用） 3. 检查网络连接
 
-### Q: 如何添加新文档？
-**A:** 1. 将.txt文件放入`data/`目录
-   2. 运行`python build_vectors.py`
-   3. 重启API服务
+**Q: 如何添加新文档？**
+A: 将文件放入`data/`目录，运行`python build_vectors.py`，重启服务。
 
-### Q: 如何集成到钉钉机器人？
-**A:** 参考`chapters/08-dingtalk-deployment.md`中的部署指南。
+## 📈 监控
 
-## 📈 监控和日志
-
-### 查看系统状态
 ```bash
-# 查看缓存状态
+# 缓存状态
 curl http://localhost:8000/cache/stats
 
-# 查看系统统计
+# 系统统计
 curl http://localhost:8000/stats
-```
 
-### 日志配置
-在`.env`中设置：
-```env
+# 日志级别（在.env中设置）
 LOG_LEVEL=INFO  # DEBUG, INFO, WARNING, ERROR
 ```
 
-## 🔄 更新和维护
-
-### 更新代码
-```bash
-git pull origin main
-pip install -r requirements.txt --upgrade
-```
-
-### 重建向量库
-```bash
-python build_vectors.py --force
-```
-
-### 清理缓存
-```bash
-curl -X POST "http://localhost:8000/cache/clear"
-```
-
-## 📞 技术支持
-
-遇到问题时：
-1. 查看本文档的常见问题
-2. 检查`chapters/`目录中的相关文档
-3. 查看API文档：http://localhost:8000/docs
-4. 检查日志文件：`logs/`目录
-
 ## 📜 许可证
 
-本代码基于MIT许可证开源。
+MIT
 
 ---
 
-*最后更新：2026年5月20日*
+*最后更新：2026年8月31日*
