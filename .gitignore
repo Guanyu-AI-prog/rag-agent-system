@@ -4,5 +4,10 @@ __pycache__/
 .env
 chroma_db/
 vector_db/
+test_vector_db/
+vector_db_backup_*/
+data/
+logs/
 *.pkl
 .DS_Store
+shortcut_cache.json

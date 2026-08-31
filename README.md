@@ -9,54 +9,55 @@
 ```
 rag-agent-system/
 │
-├── simple_rag.py                # 纯RAG（向量检索 + BM25 + Rerank）
-├── dx_agent.py                  # 纯Python Agent（正则匹配工具调用）
-├── taocan_agent.py              # LangChain Agent（逐步废弃）
+├── core/                        # 核心业务（RAG/Agent引擎）
+│   ├── simple_rag.py            #   纯RAG（向量检索 + BM25 + Rerank）
+│   ├── dx_agent.py              #   纯Python Agent（正则匹配工具调用）
+│   ├── taocan_agent.py          #   LangChain Agent（逐步废弃）
+│   ├── simple_rag_lite.py       #   RAG精简版
+│   ├── simple_rag_improvements.py #  RAG改进版
+│   └── workflow_langchain.py    #   LangChain工作流（旧）
 │
-├── api.py                       # FastAPI服务（RAG模式）
-├── api_agent.py                 # FastAPI服务（Agent模式）
-├── dx_agent_api.py              # FastAPI服务（纯Python Agent）
+├── api/                         # API服务层
+│   ├── api.py                   #   FastAPI（RAG模式）
+│   ├── api_agent.py             #   FastAPI（Agent模式）
+│   ├── dx_agent_api.py          #   FastAPI（纯Python Agent）
+│   ├── gunicorn.conf.py         #   Gunicorn配置
+│   └── start.sh                 #   启动脚本
 │
-├── config.py                    # 系统配置
-├── config_manager.py            # 配置管理器
-├── build_vectors.py             # 向量库构建
-├── local_embeddings.py          # 本地Embedding
-├── conversation_history.py      # 对话历史
-├── cache_manager.py             # 缓存管理
-├── circuit_breaker.py           # 熔断器
-├── rate_limiter.py              # 限流器
-├── metrics.py                   # 指标收集
-├── query_logger.py              # 查询日志
-├── structured_logging.py        # 结构化日志
-├── voice_api.py                 # 语音API
-├── voice_module.py              # 语音模块
-├── workflow_langchain.py        # LangChain工作流（旧）
+├── vector/                      # 向量库/Embedding
+│   ├── build_vectors.py         #   向量库构建
+│   └── local_embeddings.py      #   本地Embedding
 │
-├── gunicorn.conf.py             # Gunicorn配置
-├── start.sh                     # 启动脚本
+├── infra/                       # 基础设施（通用组件）
+│   ├── config.py                #   系统配置
+│   ├── config_manager.py        #   配置管理器
+│   ├── cache_manager.py         #   缓存管理
+│   ├── conversation_history.py  #   对话历史
+│   ├── circuit_breaker.py       #   熔断器
+│   ├── rate_limiter.py          #   限流器
+│   ├── metrics.py               #   指标收集
+│   ├── query_logger.py          #   查询日志
+│   └── structured_logging.py    #   结构化日志
+│
+├── extensions/                  # 扩展功能
+│   └── voice/                   #   语音模块
+│       ├── voice_api.py
+│       └── voice_module.py
+│
+├── evaluation/                  # 评测
+│   ├── scripts/                 #   评测脚本
+│   ├── results/                 #   评测结果JSON
+│   ├── reports/                 #   评测报告
+│   ├── tests/                   #   测试脚本 & 题库
+│   └── tools/                   #   压测/调试工具
+│
+├── static/                      # Web UI
+├── docs/                        # 文档 & 评测图表
+│
 ├── requirements.txt             # 完整依赖
 ├── requirements_pure.txt        # 精简依赖（无LangChain）
 ├── .env.example                 # 环境变量示例
-├── visualize_eval.py            # 评测数据可视化
-│
-├── data/                        # 知识库源数据
-├── docs/
-│   └── images/                  # 评测图表
-├── static/                      # Web UI
-│
-└── evaluation/                  # 评测相关
-    ├── scripts/                 # 评测脚本
-    │   ├── eval_simple_rag.py   #   纯RAG评测（5维度打分）
-    │   ├── eval_dx_agent.py     #   纯Python Agent评测
-    │   ├── eval_rag_30.py       #   早期RAG评测
-    │   └── run_evaluation.py    #   联合评测
-    ├── results/                 # 评测结果JSON
-    ├── reports/                 # 评测报告
-    ├── tests/
-    │   └── test_questions.py    # 30道标准测试题库
-    └── tools/
-        ├── benchmark.py         # 并发压测
-        └── debug_retrieval.py   # 检索调试
+└── visualize_eval.py            # 评测数据可视化
 ```
 
 ## 🚀 快速开始
@@ -72,25 +73,25 @@ cp .env.example .env
 # 编辑 .env 填入API密钥
 
 # 构建向量库
-python build_vectors.py --force
+python vector/build_vectors.py --force
 
 # 启动
-python api.py              # RAG模式
-python api_agent.py        # Agent模式
-python dx_agent_api.py     # 纯Python Agent模式
+python api/api.py              # RAG模式
+python api/api_agent.py        # Agent模式
+python api/dx_agent_api.py     # 纯Python Agent模式
 
 # 命令行测试
-python simple_rag.py "有哪些套餐？"
-python dx_agent.py "59元套餐多少流量？"
+python core/simple_rag.py "有哪些套餐？"
+python core/dx_agent.py "59元套餐多少流量？"
 ```
 
 ## 🔧 核心组件
 
 | 组件 | 文件 | 说明 |
 |------|------|------|
-| 纯RAG | `simple_rag.py` | 向量检索 + BM25 + Rerank，有缓存/熔断/限流 |
-| 纯Python Agent | `dx_agent.py` | 正则匹配工具调用，3个工具，无LangChain依赖 |
-| LangChain Agent | `taocan_agent.py` | AgentExecutor + Tool Calling，逐步废弃 |
+| 纯RAG | `core/simple_rag.py` | 向量检索 + BM25 + Rerank，有缓存/熔断/限流 |
+| 纯Python Agent | `core/dx_agent.py` | 正则匹配工具调用，3个工具，无LangChain依赖 |
+| LangChain Agent | `core/taocan_agent.py` | AgentExecutor + Tool Calling，逐步废弃 |
 
 ## 📊 评测数据可视化
 
@@ -118,13 +119,13 @@ python dx_agent.py "59元套餐多少流量？"
 A: 确保`.env`文件已填入有效的API密钥。
 
 **Q: 查询返回"向量库未初始化"**
-A: 运行`python build_vectors.py --force`构建向量库。
+A: 运行`python vector/build_vectors.py --force`构建向量库。
 
 **Q: 响应时间太长**
 A: 检查LLM模型配置，启用缓存，检查网络连接。
 
 **Q: 如何添加新文档？**
-A: 放入`data/`目录，运行`python build_vectors.py`，重启服务。
+A: 放入`data/`目录，运行`python vector/build_vectors.py`，重启服务。
 
 ## 📈 监控
 
