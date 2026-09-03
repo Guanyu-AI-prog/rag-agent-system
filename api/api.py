@@ -186,10 +186,10 @@ class EnhancedSimpleCache:
 
 
 async def monitor_cache_stats():
-    logger.info(f"缓存监控已启动，记录间隔: {Config.CACHE_MONITOR_INTERVAL}秒")
+    logger.info(f"缓存监控已启动，记录间隔: {getattr(Config, 'CACHE_MONITOR_INTERVAL', 300)}秒")
     while True:
         try:
-            await asyncio.sleep(Config.CACHE_MONITOR_INTERVAL)
+            await asyncio.sleep(getattr(Config, 'CACHE_MONITOR_INTERVAL', 300))
             if cache:
                 stats = cache.get_stats()
                 logger.info(
