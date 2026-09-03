@@ -25272,3 +25272,4 @@ pip install python-multipart
 2026-08-31 14:00:41,267 | INFO     | root                 | startup_event   | 缓存监控任务已创建
 2026-08-31 14:00:41,269 | INFO     | root                 | _load_shortcut_cache_file | 从文件加载快捷问答缓存: 6 条
 2026-08-31 14:00:41,269 | INFO     | root                 | startup_event   | 服务初始化完成（纯Python RAG模式），缓存TTL: 600秒，最大工作线程: 8
+2026-08-31 21:03:52,812 | INFO     | root                 | shutdown_event  | 关闭RAG API服务...
