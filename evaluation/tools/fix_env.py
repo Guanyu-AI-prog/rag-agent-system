@@ -14,8 +14,9 @@ with open('.env', 'r') as f:
 
 new_lines = []
 for line in lines:
-    if line.startswith('SILICONFLOW_API_KEY=*** and not line.startswith('#'):
-        new_lines.append(f'SILICONFLOW_API_KEY=***    else:
+    if line.startswith('SILICONFLOW_API_KEY=') and not line.startswith('#'):
+        new_lines.append(f'SILICONFLOW_API_KEY={key}\n')
+    else:
         new_lines.append(line)
 
 with open('.env', 'w') as f:

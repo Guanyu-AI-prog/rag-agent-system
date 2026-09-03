@@ -5,6 +5,7 @@
 """
 
 import os
+import sys
 import time
 import asyncio
 import hashlib
@@ -22,6 +23,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
 import uvicorn
+
+# ── 路径引导：无论从哪个工作目录启动都能找到 core/infra/api ──
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for _p in (os.path.join(_BASE_DIR, "core"), os.path.join(_BASE_DIR, "infra"), os.path.join(_BASE_DIR, "api")):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from simple_rag import SimpleRAG
 from config import Config
@@ -244,7 +251,7 @@ try:
     from fastapi.staticfiles import StaticFiles
     from fastapi.responses import RedirectResponse
 
-    static_dir = "static"
+    static_dir = os.path.join(_BASE_DIR, "static")
     if os.path.exists(static_dir):
         app.mount("/static", StaticFiles(directory=static_dir), name="static")
         logger.info(f"静态文件目录已挂载: {static_dir}")

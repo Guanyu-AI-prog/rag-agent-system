@@ -1,14 +1,11 @@
-# LangChain RAG 系统依赖
-# 核心依赖
-langchain>=0.1.0,<0.3.0
-langchain-community>=0.0.10,<0.3.0
-langchain-core>=0.1.7,<0.3.0
-langchain-text-splitters>=0.0.1,<0.3.0
-langchain-chroma>=0.1.0,<0.3.0
-langchain-openai>=0.0.5,<0.3.0
+# RAG Agent 系统依赖（纯 Python，无 LangChain）
 
 # 向量数据库
 chromadb>=0.4.22,<0.6.0
+
+# 混合检索（simple_rag.py 依赖）
+rank-bm25>=0.2.2
+jieba>=0.42.1
 
 # LLM API接口
 openai>=1.6.1,<2.0.0
@@ -18,7 +15,7 @@ sentence-transformers>=2.2.0
 
 # Web服务框架
 fastapi>=0.109.0,<1.0.0
-uvicorn>=0.27.0,<1.0.0
+uvicorn>=0.27.0,<0.35.0
 
 # 工具库
 python-dotenv>=1.0.0
@@ -28,7 +25,7 @@ simpleeval>=0.9.12
 
 # 文档处理
 pypdf>=3.17.0
-python-docx>=1.1.0
+python-docx>=1.0.0
 
 # 进度条和日志
 tqdm>=4.66.1
@@ -45,8 +42,6 @@ redis>=5.0.0               # Redis 会话存储（可选，不安装则使用内
 edge-tts>=6.1.0            # TTS 语音合成（免费、高质量中文）
 sounddevice>=0.4.6         # 音频采集（麦克风录音）
 soundfile>=0.12.1          # 音频文件读写
-# funasr>=1.0.0            # STT 语音识别（中文最佳，需要较大显存）
-# openai-whisper>=20231117 # STT 语音识别（通用，可选）
 
 # 注意：根据实际需求选择安装
 # pip install -r requirements.txt

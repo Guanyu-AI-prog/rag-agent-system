@@ -8,6 +8,11 @@ import sys, os, json, time, re
 os.chdir('/root/langchain_rag_code')
 sys.path.insert(0, '/root/langchain_rag_code')
 
+# 路径引导：simple_rag 在 core/，其 config 依赖在 infra/
+for _p in ('/root/langchain_rag_code/core', '/root/langchain_rag_code/infra'):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 from simple_rag import SimpleRAG
 
 # ═══════════════════════════════════════════════════

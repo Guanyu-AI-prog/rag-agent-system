@@ -247,8 +247,8 @@ TEST_CASES = [
 def run_test(agent_func=None, verbose=True):
     """运行测试，支持延时统计"""
     if agent_func is None:
-        from taocan_agent import run_single
-        agent_func = lambda q: run_single(q)["answer"]
+        from dx_agent import run_single
+        agent_func = lambda q: run_single(q, verbose=False)["answer"]
 
     results = {"total": 0, "passed": 0, "failed": 0, "by_type": {}, "latency": []}
 

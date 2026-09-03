@@ -32,7 +32,11 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import uvicorn
 
-sys.path.insert(0, os.path.dirname(__file__))
+# ── 路径引导：无论从哪个工作目录启动都能找到 core/infra/api ──
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for _p in (os.path.join(_BASE_DIR, "core"), os.path.join(_BASE_DIR, "infra"), os.path.join(_BASE_DIR, "api")):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from config import extract_plan_tiers, get_config_reloader, get_key_rotator
 from dx_agent import (
@@ -469,8 +473,8 @@ async def query_stream(request: QueryRequest):
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
     )
 
-# ── 挂载静态文件 ──
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+# ── 挂载静态文件（统一使用项目根目录 static/）──
+static_dir = os.path.join(_BASE_DIR, "static")
 if os.path.isdir(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 

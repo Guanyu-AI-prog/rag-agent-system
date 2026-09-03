@@ -1,20 +1,25 @@
 """
-向量库构建脚本
-从文档构建ChromaDB向量数据库
+向量库构建脚本（纯 Python，无 LangChain）
+从文档构建 ChromaDB 向量数据库
+
+切分器与文档结构使用 vector/text_splitter.py（与 LangChain 行为等价的纯 Python 实现），
+向量写入直接使用 chromadb 原生客户端。
 """
 
 import os
 import re
 import sys
 import shutil
+import uuid
 from pathlib import Path
 from typing import List
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import TextLoader
-from langchain_chroma import Chroma
-from langchain_core.documents import Document
+# ── 路径引导：无论从哪个工作目录启动都能找到 infra/ ──
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if os.path.join(_BASE_DIR, "infra") not in sys.path:
+    sys.path.insert(0, os.path.join(_BASE_DIR, "infra"))
 
+from text_splitter import Document, RecursiveCharacterTextSplitter
 from config import Config
 
 # 已知套餐档位（用于从chunk内容中提取plan_tier元数据）
@@ -112,6 +117,12 @@ def _should_use_plan_level(file_path: str) -> bool:
     return any(kw in filename for kw in Config.PLAN_LEVEL_CHUNK_FILES)
 
 
+def _load_text_file(file_path: Path) -> List[Document]:
+    """读取文本文件为 Document（等价于 LangChain TextLoader）"""
+    text = file_path.read_text(encoding="utf-8")
+    return [Document(page_content=text, metadata={"source": str(file_path)})]
+
+
 def build_vectorstore(
     data_dir: str = None,
     persist_directory: str = None,
@@ -170,9 +181,7 @@ def build_vectorstore(
     files = list(Path(data_dir).glob("**/*.txt")) + list(Path(data_dir).glob("**/*.md"))
     for file in files:
         try:
-            loader = TextLoader(str(file), encoding="utf-8")
-            docs = loader.load()
-            documents.extend(docs)
+            documents.extend(_load_text_file(file))
         except Exception as e:
             print(f"加载 {file.name} 失败: {e}")
 
@@ -306,21 +315,27 @@ def build_vectorstore(
             print(f"   块{i+1}: {doc.page_content[:100]}...")
 
     print("创建向量数据库...")
+    import chromadb
     import time
+    client = chromadb.PersistentClient(path=persist_directory)
+    # 与读取侧 simple_rag.VectorStore 保持一致：余弦距离
+    collection = client.get_or_create_collection(
+        name=Config.COLLECTION_NAME,
+        metadata={"hnsw:space": "cosine"}
+    )
+
     batch_size = 10  # 减小 batch 避免 API 限流
-    vectorstore = None
+    total_batches = (len(texts) + batch_size - 1) // batch_size
     for i in range(0, len(texts), batch_size):
         batch = texts[i:i + batch_size]
-        print(f"  处理批次 {i // batch_size + 1}/{(len(texts) + batch_size - 1) // batch_size}: {len(batch)} 个文档块")
-        if vectorstore is None:
-            vectorstore = Chroma.from_documents(
-                documents=batch,
-                embedding=embedding,
-                persist_directory=persist_directory,
-                collection_name=Config.COLLECTION_NAME
-            )
-        else:
-            vectorstore.add_documents(batch)
+        print(f"  处理批次 {i // batch_size + 1}/{total_batches}: {len(batch)} 个文档块")
+        embeddings = embedding.embed_documents([d.page_content for d in batch])
+        collection.add(
+            ids=[uuid.uuid4().hex for _ in batch],
+            embeddings=embeddings,
+            documents=[d.page_content for d in batch],
+            metadatas=[d.metadata for d in batch],
+        )
         # 批次间短暂等待，避免 API 限流
         if i + batch_size < len(texts):
             time.sleep(0.5)
@@ -328,7 +343,6 @@ def build_vectorstore(
     print("向量数据库已保存")
 
     print("验证向量数据库...")
-    collection = vectorstore._collection
     doc_count = collection.count()
 
     print("=" * 50)
@@ -394,9 +408,10 @@ def main():
 
         if count > 0:
             print(f"\n下一步: 启动API服务")
-            print(f"   python api.py")
+            print(f"   python api/api.py          # RAG模式")
+            print(f"   python api/dx_agent_api.py # Agent模式")
             print(f"\n测试查询:")
-            print(f"   python workflow_langchain.py '你的问题'")
+            print(f"   python core/simple_rag.py '你的问题'")
 
     except Exception as e:
         print(f"错误: {e}")
