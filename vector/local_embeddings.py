@@ -1,16 +1,15 @@
 """
 嵌入模型封装
 通过 SiliconFlow API 调用 BAAI/bge-large-zh-v1.5 (1024维)
-兼容 LangChain Embeddings 接口
+提供 embed_documents / embed_query 接口（纯 Python，无 LangChain）
 """
 import os
 from typing import List
-from langchain_core.embeddings import Embeddings
 import requests
 import time
 
 
-class LocalBGEEmbeddings(Embeddings):
+class LocalBGEEmbeddings:
     """通过 SiliconFlow API 调用嵌入模型"""
 
     def __init__(self, model_name: str = "BAAI/bge-large-zh-v1.5"):

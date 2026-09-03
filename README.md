@@ -1,6 +1,6 @@
 # RAG Agent System
 
-纯Python RAG + Agent系统，支持知识库问答、工具调用、费用计算。正在逐步去除LangChain依赖。
+纯Python RAG + Agent系统，支持知识库问答、工具调用、费用计算。已移除全部 LangChain 依赖，全栈纯 Python 实现。
 
 > ⚠️ **评测说明**：本项目评测题目来自向量数据库中的已有内容（开卷考试），系统从知识库中检索到相关文档后作答。因此准确率、召回率等指标较高，不代表系统在面对未知问题时也能达到同样效果。实际生产环境中，用户问题与知识库内容的匹配度会有所下降。
 
@@ -122,24 +122,21 @@ data/
 ```
 rag-agent-system/
 │
+├── start.sh                       # 一键启动脚本（install/build/api/agent/test）
+│
 ├── core/                        # 核心业务（RAG/Agent引擎）
 │   ├── simple_rag.py            #   纯RAG（向量+BM25+Rerank）
-│   ├── dx_agent.py              #   纯Python Agent
-│   ├── taocan_agent.py          #   LangChain Agent（逐步废弃）
-│   ├── simple_rag_lite.py       #   RAG精简版
-│   ├── simple_rag_improvements.py #  RAG改进版
-│   └── workflow_langchain.py    #   LangChain工作流（旧）
+│   └── dx_agent.py              #   纯Python Agent（工具调用，复用simple_rag检索）
 │
 ├── api/                         # API服务层
-│   ├── api.py                   #   FastAPI（RAG模式）
-│   ├── api_agent.py             #   FastAPI（Agent模式）
-│   ├── dx_agent_api.py          #   FastAPI（纯Python Agent）
-│   ├── gunicorn.conf.py         #   Gunicorn配置
-│   └── start.sh                 #   启动脚本
+│   ├── api.py                   #   FastAPI（RAG模式，端口8001）
+│   ├── dx_agent_api.py          #   FastAPI（Agent模式，端口8002）
+│   └── gunicorn.conf.py         #   Gunicorn配置
 │
 ├── vector/                      # 向量库/Embedding
-│   ├── build_vectors.py         #   向量库构建（含切分逻辑）
-│   └── local_embeddings.py      #   本地Embedding（优先本地，API兜底）
+│   ├── build_vectors.py         #   向量库构建（含切分逻辑，纯Python）
+│   ├── text_splitter.py         #   递归切分器（与LangChain行为等价的纯Python实现）
+│   └── local_embeddings.py      #   Embedding封装（SiliconFlow API）
 │
 ├── infra/                       # 基础设施（通用组件）
 │   ├── config.py                #   系统配置（含切分参数）
@@ -165,8 +162,7 @@ rag-agent-system/
 ├── static/                      # Web UI
 ├── docs/                        # 文档 & 评测图表
 │
-├── requirements.txt             # 完整依赖
-├── requirements_pure.txt        # 精简依赖（无LangChain）
+├── requirements.txt             # 依赖清单（纯Python，无LangChain）
 ├── .env.example                 # 环境变量示例
 └── visualize_eval.py            # 评测数据可视化
 ```
@@ -176,8 +172,7 @@ rag-agent-system/
 ```bash
 # 安装依赖
 python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt        # 完整版
-pip install -r requirements_pure.txt   # 精简版（纯Python Agent）
+pip install -r requirements.txt
 
 # 配置
 cp .env.example .env
@@ -186,10 +181,9 @@ cp .env.example .env
 # 构建向量库（含切分 + Embedding）
 python vector/build_vectors.py --force
 
-# 启动
-python api/api.py              # RAG模式
-python api/api_agent.py        # Agent模式
-python api/dx_agent_api.py     # 纯Python Agent模式
+# 启动（两种模式，或直接用 ./start.sh api / ./start.sh agent）
+python api/api.py              # RAG模式（端口8001）
+python api/dx_agent_api.py     # Agent模式（端口8002）
 
 # 命令行测试
 python core/simple_rag.py "有哪些套餐？"

@@ -12,6 +12,12 @@ from datetime import datetime
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+# 路径引导：simple_rag 在 core/，其 config 依赖在 infra/
+_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+for _p in (os.path.join(_BASE, 'core'), os.path.join(_BASE, 'infra')):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 from test_questions import TEST_CASES
 
 

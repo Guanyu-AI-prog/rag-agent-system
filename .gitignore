@@ -11,3 +11,5 @@ logs/
 *.pkl
 .DS_Store
 shortcut_cache.json
+*.bak
+*.bak*
